@@ -2,13 +2,14 @@ package org.dobots.robotalk.client.control;
 
 import org.dobots.robotalk.client.ZmqHandler;
 import org.dobots.robotalk.client.ZmqSettings;
+import org.dobots.robotalk.client.control.RemoteControlHelper.Move;
 import org.dobots.robotalk.client.msg.RoboCommands;
 import org.dobots.robotalk.client.msg.RoboCommands.BaseCommand;
+import org.dobots.robotalk.client.msg.RoboCommands.DriveCommand;
 import org.dobots.robotalk.client.msg.RobotMessage;
-import org.dobots.robotalk.client.utility.Utils;
+import org.dobots.utilities.Utils;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
 
 public class CommandHandler {
@@ -17,25 +18,30 @@ public class CommandHandler {
 	private ZmqSettings m_oSettings;
 	
 	// the channel on which messages are sent out
-	private Socket m_oCmdPublisher = null;
+	private ZMQ.Socket m_oCmdPublisher = null;
 	// the channel on which messages are coming in
-	private Socket m_oCmdSubscriber = null;
+	private ZMQ.Socket m_oCmdSubscriber = null;
 	
-	// thread handling the message reception
 	private CommandReceiveThread m_oRecvThread;
 	
 	private boolean m_bConnected;
 	private ICommandReceiveListener m_oListener;
 	
+	private ZMQ.Socket m_oCmdForward = null;
+	
 	public CommandHandler(ZmqHandler i_oZmqHandler) {
 		m_oZContext = i_oZmqHandler.getContext();
 		m_oSettings = i_oZmqHandler.getSettings();
+		
+		m_oCmdPublisher = m_oZContext.createSocket(ZMQ.PUSH);
+		m_oCmdSubscriber = m_oZContext.createSocket(ZMQ.SUB);
+
+		m_oCmdForward = i_oZmqHandler.createSocket(ZMQ.PUSH);
+		m_oCmdForward.bind(String.format("ipc://%s/remotectrl", ZmqHandler.getInstance().getIPCpath()));
+//		m_oCmdForward.bind("inproc://remote");
 	}
 	
 	public void setupConnections() {
-
-		m_oCmdPublisher = m_oZContext.createSocket(ZMQ.PUSH);
-		m_oCmdSubscriber = m_oZContext.createSocket(ZMQ.SUB);
 
 		// obtain chat ports from settings
 		// receive port is always equal to send port + 1
@@ -91,8 +97,16 @@ public class CommandHandler {
 						
 						String strJson = Utils.byteArrayToString(oCmdMsg.data);
 						BaseCommand oCmd = RoboCommands.decodeCommand(strJson);
-						if (m_oListener != null) {
-							m_oListener.onCommandReceived(oCmd);
+						
+						if (oCmd instanceof DriveCommand) {
+							DriveCommand dc = RoboCommands.createDriveCommand(Move.BACKWARD, 100);
+							RobotMessage rm = new RobotMessage("t", dc.toJSONString().getBytes());
+							ZMsg zm = rm.toZmsg();
+							zm.send(m_oCmdForward);
+						} else {
+							if (m_oListener != null) {
+								m_oListener.onCommandReceived(oCmd);
+							}
 						}
 						
 //						if (!oChatMsg.robotName.equals(m_oSettings.getRobotName())) {

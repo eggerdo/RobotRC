@@ -1,8 +1,10 @@
 package org.dobots.robotalk.client;
 
 import org.zeromq.ZContext;
+import org.zeromq.ZMQ.Socket;
 
 import android.app.Activity;
+import android.content.Context;
 
 public class ZmqHandler {
 	
@@ -13,11 +15,15 @@ public class ZmqHandler {
 	private Activity m_oActivity;
 
 	private ZmqSettings m_oSettings;
+	
+	private String m_strIPCpath;
 
 	public ZmqHandler(Activity i_oActivity) {
 		m_oActivity = i_oActivity;
 		
 		INSTANCE = this;
+		
+		m_strIPCpath = m_oActivity.getDir("tmp", Context.MODE_WORLD_WRITEABLE).toString();
 
         m_oZmqContext = new ZContext();
 		
@@ -38,8 +44,12 @@ public class ZmqHandler {
 		return m_oSettings;
 	}
 
-	public void createSocket(int type) {
-		m_oZmqContext.createSocket(type);
+	public Socket createSocket(int type) {
+		return m_oZmqContext.createSocket(type);
+	}
+	
+	public String getIPCpath() {
+		return m_strIPCpath;
 	}
 
 }

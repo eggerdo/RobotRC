@@ -9,6 +9,8 @@ import com.romotive.library.RomoCommandInterface;
 
 public class Romo extends DifferentialRobot {
 	
+	private static final String TAG = "Romo";
+	
 	private double m_dblBaseSpeed = 100.0;
 	
 	private RomoCommandInterface m_oController;
@@ -31,7 +33,7 @@ public class Romo extends DifferentialRobot {
 
 	@Override
 	public void destroy() {
-		m_oController.shutdown();
+		
 	}
 
 	@Override
@@ -60,7 +62,8 @@ public class Romo extends DifferentialRobot {
 		// cap the top front velocity to 255
 		i_nLeftVel = Math.min(i_nLeftVel, 255);
 		i_nRightVel = Math.min(i_nRightVel, 255);
-		m_oController.playMotorCommand(i_nLeftVel, i_nRightVel);
+		debug(TAG, String.format("motor left:%d, right:%d", i_nLeftVel, i_nRightVel));
+//		m_oController.playMotorCommand(i_nLeftVel, i_nRightVel);
 	}
 
 	@Override

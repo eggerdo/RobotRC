@@ -27,6 +27,8 @@ public class RoboCommands {
 			switch(header.getInt(RoboCommandTypes.F_HEADER_ID)) {
 			case RoboCommandTypes.DRIVE_COMMAND:
 				return getInstance().new DriveCommand(oJSON);
+			case RoboCommandTypes.CAMERA_COMMAND:
+				return getInstance().new CameraCommand(oJSON);
 			default: 
 				return null;
 			}
@@ -126,33 +128,35 @@ public class RoboCommands {
 	public static DriveCommand createDriveCommand(RemoteControlHelper.Move i_eMove, double i_dblSpeed) {
 		return getInstance().new DriveCommand(i_eMove, i_dblSpeed, 0);
 	}
+
+	public enum CameraCommandType {
+		cameraToggle,
+		cameraOff,
+		cameraOn
+	}
 	
 	public class CameraCommand extends BaseCommand {
 
-		int nCameraID;
-		boolean bOn;
+		public CameraCommandType eType;
 		
-		public CameraCommand(int i_nCameraID, boolean i_bOn) {
+		public CameraCommand(CameraCommandType i_eType) {
 			super(RoboCommandTypes.CAMERA_COMMAND);
 			
-			nCameraID = i_nCameraID;
-			bOn = i_bOn;
+			eType = i_eType;
 		}
 		
 		public CameraCommand(JSONObject i_oObj) throws JSONException {
 			super(i_oObj);
 			
 			JSONObject data = i_oObj.getJSONObject(RoboCommandTypes.S_DATA);
-			nCameraID 	= data.getInt(RoboCommandTypes.F_CAMERA_ID);
-			bOn 		= data.getBoolean(RoboCommandTypes.F_ON);
+			eType 	= CameraCommandType.valueOf(data.getString(RoboCommandTypes.F_TYPE));
 		}
 		
 		public JSONObject toJSON() {
 			JSONObject obj = super.toJSON();
 			JSONObject data = new JSONObject();
 			try {
-				data.put(RoboCommandTypes.F_CAMERA_ID, 	nCameraID);
-				data.put(RoboCommandTypes.F_ON, 		bOn);
+				data.put(RoboCommandTypes.F_TYPE, eType.toString());
 				obj.put(RoboCommandTypes.S_DATA, data);
 				return obj;
 			} catch (JSONException e) {
@@ -163,8 +167,8 @@ public class RoboCommands {
 		}
 	}
 	
-	public static CameraCommand createCameraCommand(int i_nCameraID, boolean i_bOn) {
-		return getInstance().new CameraCommand(i_nCameraID, i_bOn);
+	public static CameraCommand createCameraCommand(CameraCommandType i_eType) {
+		return getInstance().new CameraCommand(i_eType);
 	}
 	
 	public class ControlCommand extends BaseCommand {

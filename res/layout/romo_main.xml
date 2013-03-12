@@ -15,9 +15,24 @@
         android:id="@+id/btnCameraToggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
 		android:src="@android:drawable/ic_menu_camera"
 		android:background="@null" />
 
+    <TextView 
+        android:id="@+id/lblFPS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#e0ff0000"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="24sp" />
+    
     <ToggleButton
         android:id="@+id/btnRemoteControl"
         android:layout_width="wrap_content"

@@ -76,8 +76,10 @@ public class RoboTalkActivity_Client extends Activity {
 		
 //		showRobot(RobotType.RBT_SPYKEE);
 
-        setupConnections();
-		showRobot(RobotType.RBT_ROMO);
+		if (oSettings.isValid()) {
+	        setupConnections();
+			showRobot(RobotType.RBT_ROMO);
+		}
     }
 
 	private void closeConnections() {

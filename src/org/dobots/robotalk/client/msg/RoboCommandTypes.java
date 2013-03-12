@@ -30,8 +30,7 @@ public class RoboCommandTypes {
 	public static final String F_ANGLE		= "angle";
 
 	/// camera command data fields
-	public static final String F_CAMERA_ID 	= "camera";
-	public static final String F_ON			= "on";
+	public static final String F_TYPE	 	= "type";
 	
 	// control command data fields
 	public static final String F_REQUEST	= "request";

@@ -1,8 +1,10 @@
 package org.dobots.robotalk.client.control;
 
 import org.dobots.robotalk.client.control.RemoteControlHelper.Move;
+import org.dobots.robotalk.client.gui.robots.RobotView;
 import org.dobots.robotalk.client.msg.RoboCommands;
 import org.dobots.robotalk.client.msg.RoboCommands.BaseCommand;
+import org.dobots.robotalk.client.msg.RoboCommands.CameraCommand;
 import org.dobots.robotalk.client.msg.RoboCommands.DriveCommand;
 
 import android.util.Log;
@@ -17,15 +19,22 @@ public class RoboControl implements IRemoteControlListener, ICommandReceiveListe
 	
 	private CommandHandler m_oCmdHandler;
 	
-	private IRemoteControlListener m_oListener;
+	private IRemoteControlListener m_oRemoteListener;
+	private ICameraControlListener m_oCameraListener;
+	
+	private RobotView m_oRobot;
 	
 	public RoboControl(CommandHandler i_oHandler) {
 		m_oCmdHandler = i_oHandler;
 		m_oCmdHandler.setReceiveListener(this);
 	}
 
-	public void setRemoteControlListener(IRemoteControlListener i_oListener) {
-		m_oListener = i_oListener;
+	public void setRemoteControlListener(IRemoteControlListener i_oRemoteListener) {
+		m_oRemoteListener = i_oRemoteListener;
+	}
+	
+	public void setCameraControlListener(ICameraControlListener i_oCameraListener) {
+		m_oCameraListener = i_oCameraListener;
 	}
 	
 	private void sendCommand(BaseCommand i_oCmd) {
@@ -164,8 +173,23 @@ public class RoboControl implements IRemoteControlListener, ICommandReceiveListe
 	public void onCommandReceived(BaseCommand i_oCmd) {
 		if (i_oCmd instanceof DriveCommand) {
 			DriveCommand oCmd = (DriveCommand)i_oCmd;
-			if (m_oListener != null) {
-				m_oListener.onMove(oCmd.eMove, oCmd.dblSpeed, oCmd.dblAngle);
+			if (m_oRemoteListener != null) {
+				m_oRemoteListener.onMove(oCmd.eMove, oCmd.dblSpeed, oCmd.dblAngle);
+			}
+		} else if (i_oCmd instanceof CameraCommand) {
+			CameraCommand oCmd = (CameraCommand)i_oCmd;
+			if (m_oCameraListener != null) {
+				switch(oCmd.eType) {
+				case cameraOff:
+					m_oCameraListener.switchCameraOff();
+					break;
+				case cameraOn:
+					m_oCameraListener.switchCameraOn();
+					break;
+				case cameraToggle:
+					m_oCameraListener.toggleCamera();
+					break;
+				}
 			}
 		}
 	}

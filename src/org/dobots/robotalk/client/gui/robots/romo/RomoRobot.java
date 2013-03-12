@@ -1,25 +1,29 @@
 package org.dobots.robotalk.client.gui.robots.romo;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.control.IRemoteControlListener;
+import org.dobots.robotalk.client.RoboTalkActivity_Client;
+import org.dobots.robotalk.client.control.ICameraControlListener;
 import org.dobots.robotalk.client.control.RemoteControlHelper;
-import org.dobots.robotalk.client.control.RemoteControlHelper.Move;
+import org.dobots.robotalk.client.control.ZMQRemoteControl;
 import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.gui.robots.RobotView;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.robots.IRobotDevice;
 import org.dobots.robotalk.client.robots.romo.Romo;
+import org.dobots.robotalk.client.utility.log.ILogListener;
+import org.dobots.robotalk.client.utility.log.LogTypes;
 import org.dobots.utilities.CameraPreview;
 
 import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageButton;
 
-public class RomoRobot extends RobotView implements IRemoteControlListener {
+public class RomoRobot extends RobotView implements ICameraControlListener, ILogListener {
 	
 	private static Activity CONTEXT;
 	
@@ -40,13 +44,16 @@ public class RomoRobot extends RobotView implements IRemoteControlListener {
         CONTEXT = this;
         
         m_oRomo = new Romo();
+        m_oRomo.setDebug(true);
+        m_oRomo.setLogListener(this);
 
-		m_oRemoteCtrl = new RemoteControlHelper(m_oActivity, m_oRomo, this);
+		m_oRemoteCtrl = new ZMQRemoteControl(m_oActivity, m_oRomo, null);
         m_oRemoteCtrl.setProperties();
 
         m_oSensorGatherer = new RomoSensorGatherer(this);
 		m_oCamera.setFrameListener(m_oSensorGatherer);
-        
+
+		RoboTalkActivity_Client.getRoboControl().setCameraControlListener(this);
 	}
 
 	@Override
@@ -133,19 +140,35 @@ public class RomoRobot extends RobotView implements IRemoteControlListener {
 	}
 
 	@Override
-	public void onMove(RemoteControlHelper.Move i_oMove, double i_dblSpeed, double i_dblAngle) {
-//		m_oRemoteCtrl.onMove(i_oMove, i_dblSpeed, i_dblAngle);
+	public void toggleCamera() {
+		m_oCamera.toggleCamera();
 	}
 
 	@Override
-	public void onMove(RemoteControlHelper.Move i_oMove) {
-//		m_oRemoteCtrl.onMove(i_oMove);
+	public void switchCameraOn() {
+		m_oCamera.startCamera();
 	}
 
 	@Override
-	public void enableControl(boolean i_bEnable) {
-//		m_oRemoteCtrl.enableControl(i_bEnable);
-		
+	public void switchCameraOff() {
+		m_oCamera.stopCamera();
+	}
+
+	@Override
+	public void onTrace(LogTypes i_eType, String i_strTag, String i_strMessage) {
+		switch(i_eType) {
+		case tt_Debug:
+			Log.d(i_strTag, i_strMessage);
+		}
+	}
+
+	@Override
+	public void onTrace(LogTypes i_eType, String i_strTag, String i_strMessage,
+			Throwable i_oObj) {
+		switch(i_eType) {
+		case tt_Debug:
+			Log.d(i_strTag, i_strMessage);
+		}
 	}
 
 }

@@ -27,7 +27,7 @@ public class RemoteControlHelper implements IJoystickListener, IRemoteControlLis
 		NONE, STRAIGHT_FORWARD, FORWARD, STRAIGHT_BACKWARD, BACKWARD, LEFT, RIGHT
 	}
 	
-	private IRemoteControlListener m_oRemoteControlListener;
+	protected IRemoteControlListener m_oRemoteControlListener;
 	
 	private Move lastMove = Move.NONE;
 
@@ -354,6 +354,11 @@ public class RemoteControlHelper implements IJoystickListener, IRemoteControlLis
 				}
 				break;
 			}
+
+			// modify the angle so that it is between -90 and +90
+			// instead of 0 and 180
+			// where -90 is left and +90 is right
+			dblAbsAngle -= 90.0;
 			
 			m_oRemoteControlListener.onMove(thisMove, i_dblPercentage, dblAbsAngle);
 			lastMove = thisMove;
@@ -365,10 +370,6 @@ public class RemoteControlHelper implements IJoystickListener, IRemoteControlLis
 	@Override
 	public void onMove(Move i_oMove, double i_dblSpeed, double i_dblAngle) {
 
-		// modify the angle so that it is between -90 and +90
-		// instead of 0 and 180
-		// where -90 is left and +90 is right
-		i_dblAngle -= 90.0;
 		
 		if (i_dblSpeed == -1) {
 			i_dblSpeed = m_oRobot.getBaseSped();

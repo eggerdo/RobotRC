@@ -13,7 +13,6 @@ import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.robots.DifferentialRobot;
 import org.dobots.robotalk.client.robots.IMoveRepeaterListener;
 import org.dobots.robotalk.client.robots.MoveRepeater;
-import org.dobots.robotalk.client.robots.DifferentialRobot.DriveVelocityLR;
 import org.dobots.robotalk.client.robots.MoveRepeater.MoveCommand;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.AC13RoverParameters;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.VideoResolution;
