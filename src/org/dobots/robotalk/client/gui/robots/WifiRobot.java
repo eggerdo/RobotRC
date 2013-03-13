@@ -1,5 +1,7 @@
 package org.dobots.robotalk.client.gui.robots;
 
+import org.dobots.utilities.BaseActivity;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;

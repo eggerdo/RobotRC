@@ -22,7 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.AC13RoverParameters;
-import org.dobots.robotalk.client.utility.log.Loggable;
+import org.dobots.utilities.log.Loggable;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

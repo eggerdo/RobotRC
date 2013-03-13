@@ -1,13 +1,16 @@
 package org.dobots.robotalk.client;
 
 
-import org.dobots.robotalk.client.ZmqSettings.SettingsChangeListener;
-import org.dobots.robotalk.client.control.CommandHandler;
-import org.dobots.robotalk.client.control.RoboControl;
-import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.gui.robots.RobotViewFactory;
-import org.dobots.robotalk.client.utility.Utils;
+import org.dobots.robotalk.control.CommandHandler;
+import org.dobots.robotalk.control.RoboControl;
+import org.dobots.robotalk.video.VideoHandler;
+import org.dobots.robotalk.zmq.ZmqHandler;
+import org.dobots.robotalk.zmq.ZmqSettings;
+import org.dobots.robotalk.zmq.ZmqSettings.SettingsChangeListener;
+import org.dobots.utilities.Utils;
 
+import robots.RobotType;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;

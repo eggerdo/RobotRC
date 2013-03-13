@@ -9,29 +9,14 @@
     <string name="btn_control_right">Right</string> 
 
     <string name="connecting_please_wait">Connecting to the robot.\nPlease wait...</string>
-        
-    <!--  Remote Control -->
-    <string name="control_fwd">Fwd</string>    
-    <string name="control_left">Left</string>    
-    <string name="control_bwd">Bwd</string>    
-    <string name="control_right">Right</string> 
-    <string name="control">Remote Control</string>
-    
+     
     <!--  AC13 Rover -->
     <string name="ac13rover_title">AC13 Rover</string>
     <string name="ac13rover_commands">AC13 Rover Commands</string>
     <string name="ar13rover_infrared">Infrared</string>
     <string name="ac13rover_res640x480">640 x 480</string>
     <string name="ac13rover_res320x240">320 x 240</string>
-        
-    <!--  Settings --> 
-    <string name="menu_settings">Settings</string>
-    <string name="nick_name">Nickname</string>
-    <string name="address">Address</string>
-    <string name="command_port">Command Port</string>
-    <string name="video_port">Video Port</string>
-    <string name="event_port">Event Port</string>
-       
+  
     <!--  Spykee -->
     <string name="spykee_title">Spykee</string>
     <string name="spykee_commands">Spykee Commands</string>

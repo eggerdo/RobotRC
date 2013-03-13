@@ -7,6 +7,8 @@ import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes;
 import org.dobots.robotalk.client.robots.romo.RomoTypes;
 import org.dobots.robotalk.client.robots.spykee.SpykeeTypes;
 
+import robots.RobotType;
+
 //import org.dobots.robots.dotty.DottyTypes;
 //import org.dobots.robots.nxt.NXTTypes;
 //import org.dobots.robots.parrot.ParrotTypes;

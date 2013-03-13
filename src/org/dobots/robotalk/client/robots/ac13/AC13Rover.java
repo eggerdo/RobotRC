@@ -9,15 +9,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.dobots.robotalk.client.gui.robots.MessageTypes;
-import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.robots.DifferentialRobot;
 import org.dobots.robotalk.client.robots.IMoveRepeaterListener;
 import org.dobots.robotalk.client.robots.MoveRepeater;
 import org.dobots.robotalk.client.robots.MoveRepeater.MoveCommand;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.AC13RoverParameters;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.VideoResolution;
-import org.dobots.robotalk.client.utility.Utils;
+import org.dobots.utilities.Utils;
 
+import robots.RobotType;
 import android.os.Handler;
 
 public class AC13Rover extends DifferentialRobot implements IMoveRepeaterListener {

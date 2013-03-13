@@ -2,18 +2,18 @@ package org.dobots.robotalk.client.gui.robots.romo;
 
 import org.dobots.robotalk.client.R;
 import org.dobots.robotalk.client.RoboTalkActivity_Client;
-import org.dobots.robotalk.client.control.ICameraControlListener;
-import org.dobots.robotalk.client.control.RemoteControlHelper;
-import org.dobots.robotalk.client.control.ZMQRemoteControl;
-import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.gui.robots.RobotView;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
-import org.dobots.robotalk.client.robots.IRobotDevice;
 import org.dobots.robotalk.client.robots.romo.Romo;
-import org.dobots.robotalk.client.utility.log.ILogListener;
-import org.dobots.robotalk.client.utility.log.LogTypes;
+import org.dobots.robotalk.control.ICameraControlListener;
+import org.dobots.robotalk.control.RemoteControlHelper;
+import org.dobots.robotalk.control.ZMQRemoteControl;
 import org.dobots.utilities.CameraPreview;
+import org.dobots.utilities.log.ILogListener;
+import org.dobots.utilities.log.LogTypes;
 
+import robots.IRobotDevice;
+import robots.RobotType;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;

@@ -32,10 +32,10 @@ import java.net.UnknownHostException;
 
 import javax.security.auth.login.LoginException;
 
-import org.dobots.robotalk.client.VideoMessage;
-import org.dobots.robotalk.client.ZmqHandler;
 import org.dobots.robotalk.client.gui.robots.MessageTypes;
-import org.dobots.robotalk.client.utility.log.Loggable;
+import org.dobots.robotalk.video.VideoMessage;
+import org.dobots.robotalk.zmq.ZmqHandler;
+import org.dobots.utilities.log.Loggable;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 

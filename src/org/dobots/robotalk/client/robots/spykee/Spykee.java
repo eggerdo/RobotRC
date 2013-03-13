@@ -8,15 +8,15 @@ import java.util.concurrent.Executors;
 import javax.security.auth.login.LoginException;
 
 import org.dobots.robotalk.client.gui.robots.MessageTypes;
-import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.robots.DifferentialRobot;
 import org.dobots.robotalk.client.robots.IMoveRepeaterListener;
 import org.dobots.robotalk.client.robots.MoveRepeater;
 import org.dobots.robotalk.client.robots.MoveRepeater.MoveCommand;
 import org.dobots.robotalk.client.robots.spykee.SpykeeController.DockState;
 import org.dobots.robotalk.client.robots.spykee.SpykeeTypes.SpykeeSound;
-import org.dobots.robotalk.client.utility.Utils;
+import org.dobots.utilities.Utils;
 
+import robots.RobotType;
 import android.os.Handler;
 import android.os.Message;
 

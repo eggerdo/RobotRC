@@ -1,5 +1,7 @@
 package org.dobots.robotalk.client.gui.robots;
 
+import org.dobots.utilities.BaseActivity;
+
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.TextView;

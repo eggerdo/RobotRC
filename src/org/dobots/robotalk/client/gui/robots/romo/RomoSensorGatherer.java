@@ -1,11 +1,11 @@
 package org.dobots.robotalk.client.gui.robots.romo;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.VideoMessage;
-import org.dobots.robotalk.client.ZmqHandler;
-import org.dobots.robotalk.client.gui.robots.BaseActivity;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
+import org.dobots.robotalk.video.VideoMessage;
+import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.utilities.CameraPreview.CameraPreviewCallback;
+import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.Utils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;

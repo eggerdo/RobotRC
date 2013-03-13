@@ -1,6 +1,8 @@
 package org.dobots.robotalk.client.robots;
 
-import org.dobots.robotalk.client.utility.log.Loggable;
+import org.dobots.utilities.log.Loggable;
+
+import robots.IRobotDevice;
 
 public abstract class BaseRobot extends Loggable implements IRobotDevice {
 

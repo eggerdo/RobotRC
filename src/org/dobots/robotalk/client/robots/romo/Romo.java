@@ -2,8 +2,9 @@ package org.dobots.robotalk.client.robots.romo;
 
 import java.io.IOException;
 
-import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.robots.DifferentialRobot;
+
+import robots.RobotType;
 
 import com.romotive.library.RomoCommandInterface;
 

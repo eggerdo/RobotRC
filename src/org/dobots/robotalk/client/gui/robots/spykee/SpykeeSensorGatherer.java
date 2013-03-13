@@ -2,13 +2,13 @@ package org.dobots.robotalk.client.gui.robots.spykee;
 
 import org.dobots.robotalk.client.R;
 import org.dobots.robotalk.client.RoboTalkTypes;
-import org.dobots.robotalk.client.gui.robots.BaseActivity;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.robots.spykee.Spykee;
 import org.dobots.robotalk.client.robots.spykee.SpykeeController.DockState;
 import org.dobots.robotalk.client.robots.spykee.SpykeeMessageTypes;
-import org.dobots.robotalk.client.utility.ScalableImageView;
-import org.dobots.robotalk.client.utility.Utils;
+import org.dobots.utilities.BaseActivity;
+import org.dobots.utilities.ScalableImageView;
+import org.dobots.utilities.Utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

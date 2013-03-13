@@ -1,8 +1,13 @@
 package org.dobots.robotalk.client.gui.robots;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.robots.IRobotDevice;
+import org.dobots.utilities.AccelerometerManager;
+import org.dobots.utilities.BaseActivity;
+import org.dobots.utilities.IAccelerometerListener;
+import org.dobots.utilities.ProgressDlg;
 
+import robots.IRobotDevice;
+import robots.RobotType;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -120,8 +125,8 @@ public abstract class RobotView extends BaseActivity implements IAccelerometerLi
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (AccelerometerManager.isSupported()) {
-			AccelerometerManager.startListening(this);
+		if (AccelerometerManager.isSupported(this)) {
+			AccelerometerManager.startListening(this, this);
 		}
 	}
 	

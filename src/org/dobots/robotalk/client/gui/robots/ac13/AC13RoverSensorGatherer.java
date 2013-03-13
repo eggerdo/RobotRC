@@ -1,15 +1,15 @@
 package org.dobots.robotalk.client.gui.robots.ac13;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.VideoMessage;
-import org.dobots.robotalk.client.ZmqHandler;
-import org.dobots.robotalk.client.gui.robots.BaseActivity;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.robots.ac13.AC13Rover;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.VideoResolution;
 import org.dobots.robotalk.client.robots.ac13.IAC13VideoListener;
-import org.dobots.robotalk.client.utility.ScalableImageView;
-import org.dobots.robotalk.client.utility.Utils;
+import org.dobots.robotalk.video.VideoMessage;
+import org.dobots.robotalk.zmq.ZmqHandler;
+import org.dobots.utilities.BaseActivity;
+import org.dobots.utilities.ScalableImageView;
+import org.dobots.utilities.Utils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;

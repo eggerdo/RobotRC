@@ -1,17 +1,17 @@
 package org.dobots.robotalk.client.gui.robots.ac13;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.control.RemoteControlHelper;
-import org.dobots.robotalk.client.gui.robots.BaseActivity;
 import org.dobots.robotalk.client.gui.robots.IConnectListener;
-import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.gui.robots.WifiRobot;
-import org.dobots.robotalk.client.robots.IRobotDevice;
 import org.dobots.robotalk.client.robots.ac13.AC13Rover;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.VideoResolution;
-import org.dobots.robotalk.client.utility.Utils;
+import org.dobots.robotalk.control.RemoteControlHelper;
+import org.dobots.utilities.BaseActivity;
+import org.dobots.utilities.Utils;
 
+import robots.IRobotDevice;
+import robots.RobotType;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;

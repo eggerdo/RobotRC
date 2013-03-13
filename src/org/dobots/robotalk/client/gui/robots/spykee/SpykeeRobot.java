@@ -19,21 +19,21 @@
 package org.dobots.robotalk.client.gui.robots.spykee;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.control.IRemoteControlListener;
-import org.dobots.robotalk.client.control.RemoteControlHelper;
-import org.dobots.robotalk.client.gui.robots.BaseActivity;
 import org.dobots.robotalk.client.gui.robots.IConnectListener;
-import org.dobots.robotalk.client.gui.robots.RobotType;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.gui.robots.WifiRobot;
-import org.dobots.robotalk.client.robots.IRobotDevice;
 import org.dobots.robotalk.client.robots.spykee.Spykee;
 import org.dobots.robotalk.client.robots.spykee.SpykeeController.DockState;
 import org.dobots.robotalk.client.robots.spykee.SpykeeMessageTypes;
 import org.dobots.robotalk.client.robots.spykee.SpykeeTypes;
 import org.dobots.robotalk.client.robots.spykee.SpykeeTypes.SpykeeSound;
-import org.dobots.robotalk.client.utility.Utils;
+import org.dobots.robotalk.control.IRemoteControlListener;
+import org.dobots.robotalk.control.RemoteControlHelper;
+import org.dobots.utilities.BaseActivity;
+import org.dobots.utilities.Utils;
 
+import robots.IRobotDevice;
+import robots.RobotType;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
