@@ -40,7 +40,7 @@ public class AC13RoverSensorGatherer extends SensorGatherer implements IAC13Vide
 	private Socket videoSocket;
 	
 	public AC13RoverSensorGatherer(BaseActivity i_oActivity, AC13Rover i_oRover) {
-		super(i_oActivity);
+		super(i_oActivity, "AC13RoverSensorGatherer");
 		m_oRover = i_oRover;
 		
 		videoSocket = ZmqHandler.getInstance().getContext().createSocket(ZMQ.PUSH);
@@ -182,6 +182,11 @@ public class AC13RoverSensorGatherer extends SensorGatherer implements IAC13Vide
 	public void setResolution(final VideoResolution i_eResolution) {
 		startVideo();
 		m_oRover.setResolution(i_eResolution);
+	}
+
+	@Override
+	public void shutDown() {
+		
 	}
 
 }

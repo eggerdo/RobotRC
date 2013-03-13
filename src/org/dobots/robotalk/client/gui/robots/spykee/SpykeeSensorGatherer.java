@@ -1,11 +1,11 @@
 package org.dobots.robotalk.client.gui.robots.spykee;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.RoboTalkTypes;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.robots.spykee.Spykee;
 import org.dobots.robotalk.client.robots.spykee.SpykeeController.DockState;
 import org.dobots.robotalk.client.robots.spykee.SpykeeMessageTypes;
+import org.dobots.robotalk.video.VideoTypes;
 import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.ScalableImageView;
 import org.dobots.utilities.Utils;
@@ -44,7 +44,7 @@ public class SpykeeSensorGatherer extends SensorGatherer {
     private long m_lLastTime = System.currentTimeMillis();
 
 	public SpykeeSensorGatherer(BaseActivity i_oActivity, Spykee i_oSpykee) {
-		super(i_oActivity);
+		super(i_oActivity, "SpykeeSensorGatherer");
 		m_oSpykee = i_oSpykee;
 
 //		videoSocket = RoboTalkActivity_Client.getZContext().createSocket(ZMQ.PUSH);
@@ -117,7 +117,7 @@ public class SpykeeSensorGatherer extends SensorGatherer {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case RoboTalkTypes.SET_FPS:
+			case VideoTypes.SET_FPS:
 				if (m_bDebug) {
 					final int fps_user = (Integer) msg.obj;
 					
@@ -199,7 +199,7 @@ public class SpykeeSensorGatherer extends SensorGatherer {
             if ((now - m_lLastTime) >= 1000)
             {
             	Message uiMsg = m_oSensorDataUiUpdater.obtainMessage();
-	        	uiMsg.what = RoboTalkTypes.SET_FPS;
+	        	uiMsg.what = VideoTypes.SET_FPS;
 	        	uiMsg.obj = m_nFpsCounter;
 	        	m_oSensorDataUiUpdater.dispatchMessage(uiMsg);
 	            
@@ -275,6 +275,12 @@ public class SpykeeSensorGatherer extends SensorGatherer {
 	}
 
 	public void setAudioEnabled(boolean i_bAudioEnabled) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void shutDown() {
 		// TODO Auto-generated method stub
 		
 	}

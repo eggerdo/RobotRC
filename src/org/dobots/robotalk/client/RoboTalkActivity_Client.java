@@ -9,6 +9,7 @@ import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.robotalk.zmq.ZmqSettings;
 import org.dobots.robotalk.zmq.ZmqSettings.SettingsChangeListener;
 import org.dobots.utilities.Utils;
+import org.zeromq.ZMQ;
 
 import robots.RobotType;
 import android.app.Activity;
@@ -38,6 +39,7 @@ public class RoboTalkActivity_Client extends Activity {
 	private VideoHandler m_oVideoHandler;
 	
 	private ZmqHandler m_oZmqHandler;
+	ZmqSettings m_oSettings;
 	
 	private Button m_btnZmqSettings;
 	private Button m_btnConnect;
@@ -56,10 +58,10 @@ public class RoboTalkActivity_Client extends Activity {
         CONTEXT = this;
         
         m_oZmqHandler = new ZmqHandler(this);
-        ZmqSettings oSettings = m_oZmqHandler.getSettings();
+        m_oSettings = m_oZmqHandler.getSettings();
 
-        m_oVideoHandler = new VideoHandler(m_oZmqHandler.getContext(), oSettings);
-        oSettings.setSettingsChangeListener(new SettingsChangeListener() {
+        m_oVideoHandler = new VideoHandler(m_oZmqHandler.getContext());
+        m_oSettings.setSettingsChangeListener(new SettingsChangeListener() {
 			
 			@Override
 			public void onChange() {
@@ -79,7 +81,7 @@ public class RoboTalkActivity_Client extends Activity {
 		
 //		showRobot(RobotType.RBT_SPYKEE);
 
-		if (oSettings.isValid()) {
+		if (m_oSettings.isValid()) {
 	        setupConnections();
 			showRobot(RobotType.RBT_ROMO);
 		}
@@ -91,8 +93,24 @@ public class RoboTalkActivity_Client extends Activity {
 	}
 
 	private void setupConnections() {
-		m_oVideoHandler.setupConnections();
+		setupVideoConnection();
 		m_oCommandHandler.setupConnections();
+	}
+	
+	private void setupVideoConnection() {
+		ZMQ.Socket oVideoSender = m_oZmqHandler.createSocket(ZMQ.PUB);
+
+		// obtain video ports from settings
+		// receive port is always equal to send port + 1
+		int nVideoSendPort = m_oSettings.getVideoPort();
+		
+		// set the output queue size down, we don't really want to have old video frames displayed
+		// we only want the most recent ones
+		oVideoSender.setHWM(20);
+
+		oVideoSender.connect(String.format("tcp://%s:%d", m_oSettings.getAddress(), nVideoSendPort));
+
+		m_oVideoHandler.setupConnections(null, oVideoSender);
 	}
     
     public static RoboControl getRoboControl() {

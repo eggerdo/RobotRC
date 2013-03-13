@@ -50,7 +50,7 @@ public class RomoRobot extends RobotView implements ICameraControlListener, ILog
 		m_oRemoteCtrl = new ZMQRemoteControl(m_oActivity, m_oRomo, null);
         m_oRemoteCtrl.setProperties();
 
-        m_oSensorGatherer = new RomoSensorGatherer(this);
+        m_oSensorGatherer = new RomoSensorGatherer(this, m_oRomo);
 		m_oCamera.setFrameListener(m_oSensorGatherer);
 
 		RoboTalkActivity_Client.getRoboControl().setCameraControlListener(this);

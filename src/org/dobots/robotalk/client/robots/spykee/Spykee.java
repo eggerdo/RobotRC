@@ -67,6 +67,11 @@ public class Spykee extends DifferentialRobot implements IMoveRepeaterListener {
 	public String getAddress() {
 		return m_strAddress;
 	}
+
+	@Override
+	public String getName() {
+		return getType().toString();
+	}
 	
 	public void setHandler(Handler i_oUiHandler) {
 		m_oUiHandler = i_oUiHandler;

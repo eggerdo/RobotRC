@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.TextView;
 
-public class SensorGatherer extends Thread {
+public abstract class SensorGatherer extends Thread {
 
 	private volatile boolean m_bStopped = false;
 	private volatile boolean m_bPaused = true;
@@ -21,7 +21,9 @@ public class SensorGatherer extends Thread {
 //		// why?
 //	}
 	
-	public SensorGatherer(BaseActivity i_oActivity) {
+	public SensorGatherer(BaseActivity i_oActivity, String i_strThreadName) {
+		super(i_strThreadName);
+		
 		m_oActivity = i_oActivity;
 
 		m_oUiHandler = new Handler(Looper.getMainLooper());
@@ -30,6 +32,7 @@ public class SensorGatherer extends Thread {
 	public void stopThread() {
 		m_bStopped = true;
 		interrupt();
+		shutDown();
 	}
 	
 	public void pauseThread() {
@@ -55,6 +58,8 @@ public class SensorGatherer extends Thread {
 			}			
 		}
 	}
+	
+	public abstract void shutDown();
 	
 	protected void execute() {
 		// needs to be defined by child class

@@ -33,6 +33,11 @@ public class Romo extends DifferentialRobot {
 	}
 
 	@Override
+	public String getName() {
+		return getType().toString();
+	}
+	
+	@Override
 	public void destroy() {
 		
 	}

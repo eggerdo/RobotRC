@@ -2,6 +2,8 @@ package org.dobots.robotalk.client.gui.robots.romo;
 
 import org.dobots.robotalk.client.R;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
+import org.dobots.robotalk.client.robots.romo.Romo;
+import org.dobots.robotalk.video.VideoHandler;
 import org.dobots.robotalk.video.VideoMessage;
 import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.utilities.CameraPreview.CameraPreviewCallback;
@@ -14,19 +16,30 @@ import android.widget.TextView;
 
 public class RomoSensorGatherer extends SensorGatherer implements CameraPreviewCallback {
 
-	private ZMQ.Socket videoSocket;
+	private ZMQ.Socket m_oVideoSocket;
 
 	private TextView m_lblFPS;
 
 	public static final int SET_FPS				= 1001;
 	
-	public RomoSensorGatherer(BaseActivity i_oActivity) {
-		super(i_oActivity);
+	private Romo m_oRomo;
+	
+	private String m_strVideoAddr;
+	
+	public RomoSensorGatherer(BaseActivity i_oActivity, Romo i_oRomo) {
+		super(i_oActivity, "RomoSensorGatherer");
+		m_oRomo = i_oRomo;
 
-		videoSocket = ZmqHandler.getInstance().getContext().createSocket(ZMQ.PUSH);
-		videoSocket.connect("inproc://video");
+		m_strVideoAddr = "inproc://romo_video";
+
+		m_oVideoSocket = ZmqHandler.getInstance().getContext().createSocket(ZMQ.PUSH);
+		m_oVideoSocket.bind(m_strVideoAddr);
+
+		VideoHandler.getInstance().registerVideo(m_strVideoAddr);
 		
 		m_lblFPS = (TextView) i_oActivity.findViewById(R.id.lblFPS);
+		
+		start();
 	}
 
     private int m_nFpsCounterPartner = 0;
@@ -37,9 +50,9 @@ public class RomoSensorGatherer extends SensorGatherer implements CameraPreviewC
 	@Override
 	public void onFrame(byte[] rgb, int width, int height) {
 
-		VideoMessage vmsg = new VideoMessage("Spykee", rgb);
+		VideoMessage vmsg = new VideoMessage(m_oRomo.getName(), rgb);
 		ZMsg zmsg = vmsg.toZmsg();
-		zmsg.send(videoSocket);
+		zmsg.send(m_oVideoSocket);
 		
         if (m_bDebug) {
             ++m_nFpsCounterPartner;
@@ -65,6 +78,12 @@ public class RomoSensorGatherer extends SensorGatherer implements CameraPreviewC
                 m_nFpsCounterPartner = 0;
             }
         }
+	}
+
+	@Override
+	public void shutDown() {
+		VideoHandler.getInstance().unregisterVideo(m_strVideoAddr);
+		m_oVideoSocket.close();
 	}
 	
 	
