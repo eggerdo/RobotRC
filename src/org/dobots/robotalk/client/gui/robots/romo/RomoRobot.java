@@ -1,13 +1,11 @@
 package org.dobots.robotalk.client.gui.robots.romo;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.RoboTalkActivity_Client;
 import org.dobots.robotalk.client.gui.robots.RobotView;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.robots.romo.Romo;
 import org.dobots.robotalk.control.ICameraControlListener;
-import org.dobots.robotalk.control.RemoteControlHelper;
-import org.dobots.robotalk.control.ZMQRemoteControl;
+import org.dobots.robotalk.control.ZmqRemoteControl;
 import org.dobots.utilities.CameraPreview;
 import org.dobots.utilities.log.ILogListener;
 import org.dobots.utilities.log.LogTypes;
@@ -33,7 +31,7 @@ public class RomoRobot extends RobotView implements ICameraControlListener, ILog
 	
 	private ImageButton m_btnCameraToggle;
 
-	private RemoteControlHelper m_oRemoteCtrl;
+	private ZmqRemoteControl m_oRemoteCtrl;
 	
 	private RomoSensorGatherer m_oSensorGatherer;
 
@@ -47,13 +45,13 @@ public class RomoRobot extends RobotView implements ICameraControlListener, ILog
         m_oRomo.setDebug(true);
         m_oRomo.setLogListener(this);
 
-		m_oRemoteCtrl = new ZMQRemoteControl(m_oActivity, m_oRomo, null);
+		m_oRemoteCtrl = new ZmqRemoteControl(m_oActivity, m_oRomo, null);
         m_oRemoteCtrl.setProperties();
+		m_oRemoteCtrl.setCameraControlListener(this);
 
         m_oSensorGatherer = new RomoSensorGatherer(this, m_oRomo);
 		m_oCamera.setFrameListener(m_oSensorGatherer);
 
-		RoboTalkActivity_Client.getRoboControl().setCameraControlListener(this);
 	}
 
 	@Override

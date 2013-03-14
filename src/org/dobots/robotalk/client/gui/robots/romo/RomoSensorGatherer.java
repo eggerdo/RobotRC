@@ -6,8 +6,8 @@ import org.dobots.robotalk.client.robots.romo.Romo;
 import org.dobots.robotalk.video.VideoHandler;
 import org.dobots.robotalk.video.VideoMessage;
 import org.dobots.robotalk.zmq.ZmqHandler;
-import org.dobots.utilities.CameraPreview.CameraPreviewCallback;
 import org.dobots.utilities.BaseActivity;
+import org.dobots.utilities.CameraPreview.CameraPreviewCallback;
 import org.dobots.utilities.Utils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
@@ -35,7 +35,7 @@ public class RomoSensorGatherer extends SensorGatherer implements CameraPreviewC
 		m_oVideoSocket = ZmqHandler.getInstance().getContext().createSocket(ZMQ.PUSH);
 		m_oVideoSocket.bind(m_strVideoAddr);
 
-		VideoHandler.getInstance().registerVideo(m_strVideoAddr);
+		VideoHandler.getInstance().publishVideo(m_strVideoAddr);
 		
 		m_lblFPS = (TextView) i_oActivity.findViewById(R.id.lblFPS);
 		
@@ -82,7 +82,7 @@ public class RomoSensorGatherer extends SensorGatherer implements CameraPreviewC
 
 	@Override
 	public void shutDown() {
-		VideoHandler.getInstance().unregisterVideo(m_strVideoAddr);
+		VideoHandler.getInstance().unpublishVideo(m_strVideoAddr);
 		m_oVideoSocket.close();
 	}
 	

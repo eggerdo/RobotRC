@@ -3,7 +3,6 @@ package org.dobots.robotalk.client;
 
 import org.dobots.robotalk.client.gui.robots.RobotViewFactory;
 import org.dobots.robotalk.control.CommandHandler;
-import org.dobots.robotalk.control.RoboControl;
 import org.dobots.robotalk.video.VideoHandler;
 import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.robotalk.zmq.ZmqSettings;
@@ -29,7 +28,7 @@ public class RoboTalkActivity_Client extends Activity {
 
 	private static final String TAG = "RoboTalk";
 
-	private static Context CONTEXT;
+	private static Activity CONTEXT;
 	
 	private static final int SETTINGS_ID 		= 0;
 
@@ -46,8 +45,6 @@ public class RoboTalkActivity_Client extends Activity {
 
 	private CommandHandler m_oCommandHandler;
 
-	private static RoboControl ROBOT_CONTROL;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,6 +53,7 @@ public class RoboTalkActivity_Client extends Activity {
         setProperties();
 
         CONTEXT = this;
+        Utils.setContext(CONTEXT);
         
         m_oZmqHandler = new ZmqHandler(this);
         m_oSettings = m_oZmqHandler.getSettings();
@@ -71,7 +69,6 @@ public class RoboTalkActivity_Client extends Activity {
 		});
         
         m_oCommandHandler = new CommandHandler(m_oZmqHandler);
-        ROBOT_CONTROL = new RoboControl(m_oCommandHandler);
         
 		PowerManager powerManager =
 				(PowerManager)getSystemService(Context.POWER_SERVICE);
@@ -94,7 +91,7 @@ public class RoboTalkActivity_Client extends Activity {
 
 	private void setupConnections() {
 		setupVideoConnection();
-		m_oCommandHandler.setupConnections();
+		setupCommandConnection();
 	}
 	
 	private void setupVideoConnection() {
@@ -112,10 +109,20 @@ public class RoboTalkActivity_Client extends Activity {
 
 		m_oVideoHandler.setupConnections(null, oVideoSender);
 	}
-    
-    public static RoboControl getRoboControl() {
-    	return ROBOT_CONTROL;
-    }
+	
+	private void setupCommandConnection() {
+		ZMQ.Socket oCommandReceiver = m_oZmqHandler.createSocket(ZMQ.SUB);
+
+		// obtain command ports from settings
+		// receive port is always equal to send port + 1
+		int nCommandRecvPort = m_oSettings.getCommandPort() + 1;
+		
+		oCommandReceiver.connect(String.format("tcp://%s:%d", m_oSettings.getAddress(), nCommandRecvPort));
+		oCommandReceiver.subscribe("".getBytes());
+		
+		m_oCommandHandler.setupConnections(oCommandReceiver, null);
+
+	}
     
     private void setProperties() {
         setContentView(R.layout.main);
@@ -153,7 +160,7 @@ public class RoboTalkActivity_Client extends Activity {
 		startActivity(intent);
 	}
 
-	public static Context getContext() {
+	public static Activity getActivity() {
 		return CONTEXT;
 	}
 	
