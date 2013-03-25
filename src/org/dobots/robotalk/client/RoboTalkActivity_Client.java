@@ -3,12 +3,15 @@ package org.dobots.robotalk.client;
 
 import org.dobots.robotalk.client.gui.robots.RobotViewFactory;
 import org.dobots.robotalk.control.CommandHandler;
+import org.dobots.robotalk.control.CommandHandler.CommandListener;
 import org.dobots.robotalk.video.VideoHandler;
 import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.robotalk.zmq.ZmqSettings;
 import org.dobots.robotalk.zmq.ZmqSettings.SettingsChangeListener;
+import org.dobots.robotalk.zmq.ZmqTypes;
 import org.dobots.utilities.Utils;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMsg;
 
 import robots.RobotType;
 import android.app.Activity;
@@ -43,7 +46,8 @@ public class RoboTalkActivity_Client extends Activity {
 	private Button m_btnZmqSettings;
 	private Button m_btnConnect;
 
-	private CommandHandler m_oCommandHandler;
+	private CommandHandler m_oExtCommandHandler;
+	private CommandHandler m_oIntCommandHandler;
 
     /** Called when the activity is first created. */
     @Override
@@ -67,8 +71,9 @@ public class RoboTalkActivity_Client extends Activity {
 				setupConnections();
 			}
 		});
-        
-        m_oCommandHandler = new CommandHandler(m_oZmqHandler);
+
+        m_oExtCommandHandler = new CommandHandler(m_oZmqHandler);
+        m_oIntCommandHandler = new CommandHandler(m_oZmqHandler);
         
 		PowerManager powerManager =
 				(PowerManager)getSystemService(Context.POWER_SERVICE);
@@ -86,7 +91,7 @@ public class RoboTalkActivity_Client extends Activity {
 
 	private void closeConnections() {
 		m_oVideoHandler.closeConnections();
-		m_oCommandHandler.closeConnections();
+		m_oExtCommandHandler.closeConnections();
 	}
 
 	private void setupConnections() {
@@ -120,10 +125,23 @@ public class RoboTalkActivity_Client extends Activity {
 		oCommandReceiver.connect(String.format("tcp://%s:%d", m_oSettings.getAddress(), nCommandRecvPort));
 		oCommandReceiver.subscribe("".getBytes());
 		
-		m_oCommandHandler.setupConnections(oCommandReceiver, null);
+		m_oExtCommandHandler.setupConnections(oCommandReceiver, null);
+		
+		ZMQ.Socket oCommandInternalSend = m_oZmqHandler.createSocket(ZMQ.PUB);
+		oCommandInternalSend.bind(ZmqTypes.COMMAND_ADDRESS);
+		
+		m_oIntCommandHandler.setupConnections(null, oCommandInternalSend);
 
+        m_oExtCommandHandler.setCommandListener(new CommandListener() {
+			
+			@Override
+			public void onCommand(ZMsg i_oMsg) {
+				m_oIntCommandHandler.sendZmsg(i_oMsg);
+			}
+		});
+        
 	}
-    
+	
     private void setProperties() {
         setContentView(R.layout.main);
 

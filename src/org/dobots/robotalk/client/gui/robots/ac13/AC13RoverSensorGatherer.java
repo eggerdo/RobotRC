@@ -5,7 +5,7 @@ import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.robots.ac13.AC13Rover;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.VideoResolution;
 import org.dobots.robotalk.client.robots.ac13.IAC13VideoListener;
-import org.dobots.robotalk.video.VideoMessage;
+import org.dobots.robotalk.msg.VideoMessage;
 import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.ScalableImageView;
