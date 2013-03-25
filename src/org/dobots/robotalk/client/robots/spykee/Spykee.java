@@ -69,7 +69,7 @@ public class Spykee extends DifferentialRobot implements IMoveRepeaterListener {
 	}
 
 	@Override
-	public String getName() {
+	public String getID() {
 		return getType().toString();
 	}
 	

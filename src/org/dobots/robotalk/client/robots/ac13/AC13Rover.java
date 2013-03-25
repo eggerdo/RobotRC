@@ -86,7 +86,7 @@ public class AC13Rover extends DifferentialRobot implements IMoveRepeaterListene
 	}
 
 	@Override
-	public String getName() {
+	public String getID() {
 		return getType().toString();
 	}
 	

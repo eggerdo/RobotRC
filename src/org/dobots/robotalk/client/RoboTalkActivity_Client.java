@@ -2,13 +2,11 @@ package org.dobots.robotalk.client;
 
 
 import org.dobots.robotalk.client.gui.robots.RobotViewFactory;
-import org.dobots.robotalk.control.CommandHandler;
-import org.dobots.robotalk.control.CommandHandler.CommandListener;
-import org.dobots.robotalk.video.VideoHandler;
 import org.dobots.robotalk.zmq.ZmqHandler;
+import org.dobots.robotalk.zmq.ZmqMessageHandler;
+import org.dobots.robotalk.zmq.ZmqMessageHandler.ZmqMessageListener;
 import org.dobots.robotalk.zmq.ZmqSettings;
 import org.dobots.robotalk.zmq.ZmqSettings.SettingsChangeListener;
-import org.dobots.robotalk.zmq.ZmqTypes;
 import org.dobots.utilities.Utils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
@@ -38,16 +36,16 @@ public class RoboTalkActivity_Client extends Activity {
 	// general
 	private WakeLock m_oWakeLock;
 	
-	private VideoHandler m_oVideoHandler;
-	
+
+	private ZmqMessageHandler m_oVideoHandler_External;
+		
 	private ZmqHandler m_oZmqHandler;
 	ZmqSettings m_oSettings;
 	
 	private Button m_btnZmqSettings;
 	private Button m_btnConnect;
 
-	private CommandHandler m_oExtCommandHandler;
-	private CommandHandler m_oIntCommandHandler;
+	private ZmqMessageHandler m_oCmdHandler_External;
 
     /** Called when the activity is first created. */
     @Override
@@ -62,7 +60,6 @@ public class RoboTalkActivity_Client extends Activity {
         m_oZmqHandler = new ZmqHandler(this);
         m_oSettings = m_oZmqHandler.getSettings();
 
-        m_oVideoHandler = new VideoHandler(m_oZmqHandler.getContext());
         m_oSettings.setSettingsChangeListener(new SettingsChangeListener() {
 			
 			@Override
@@ -72,8 +69,9 @@ public class RoboTalkActivity_Client extends Activity {
 			}
 		});
 
-        m_oExtCommandHandler = new CommandHandler(m_oZmqHandler);
-        m_oIntCommandHandler = new CommandHandler(m_oZmqHandler);
+        m_oVideoHandler_External = new ZmqMessageHandler();
+
+        m_oCmdHandler_External = new ZmqMessageHandler();
         
 		PowerManager powerManager =
 				(PowerManager)getSystemService(Context.POWER_SERVICE);
@@ -90,8 +88,8 @@ public class RoboTalkActivity_Client extends Activity {
     }
 
 	private void closeConnections() {
-		m_oVideoHandler.closeConnections();
-		m_oExtCommandHandler.closeConnections();
+		m_oVideoHandler_External.closeConnections();
+		m_oCmdHandler_External.closeConnections();
 	}
 
 	private void setupConnections() {
@@ -112,7 +110,24 @@ public class RoboTalkActivity_Client extends Activity {
 
 		oVideoSender.connect(String.format("tcp://%s:%d", m_oSettings.getAddress(), nVideoSendPort));
 
-		m_oVideoHandler.setupConnections(null, oVideoSender);
+		m_oVideoHandler_External.setupConnections(null, oVideoSender);
+
+		// link external with internal command handler. incoming commands in external are sent to
+		// internal, incoming commands on internal are sent to external
+		m_oVideoHandler_External.setIncomingMessageListener(new ZmqMessageListener() {
+			
+			@Override
+			public void onMessage(ZMsg i_oMsg) {
+				m_oZmqHandler.getVideoHandler().sendZmsg(i_oMsg);
+			}
+		}); 
+        m_oZmqHandler.getVideoHandler().setIncomingMessageListener(new ZmqMessageListener() {
+			
+			@Override
+			public void onMessage(ZMsg i_oMsg) {
+				m_oVideoHandler_External.sendZmsg(i_oMsg);
+			}
+		});
 	}
 	
 	private void setupCommandConnection() {
@@ -125,18 +140,22 @@ public class RoboTalkActivity_Client extends Activity {
 		oCommandReceiver.connect(String.format("tcp://%s:%d", m_oSettings.getAddress(), nCommandRecvPort));
 		oCommandReceiver.subscribe("".getBytes());
 		
-		m_oExtCommandHandler.setupConnections(oCommandReceiver, null);
+		m_oCmdHandler_External.setupConnections(oCommandReceiver, null);
 		
-		ZMQ.Socket oCommandInternalSend = m_oZmqHandler.createSocket(ZMQ.PUB);
-		oCommandInternalSend.bind(ZmqTypes.COMMAND_ADDRESS);
-		
-		m_oIntCommandHandler.setupConnections(null, oCommandInternalSend);
-
-        m_oExtCommandHandler.setCommandListener(new CommandListener() {
+		// link external with internal command handler. incoming commands in external are sent to
+		// internal, incoming commands on internal are sent to external
+        m_oCmdHandler_External.setIncomingMessageListener(new ZmqMessageListener() {
 			
 			@Override
-			public void onCommand(ZMsg i_oMsg) {
-				m_oIntCommandHandler.sendZmsg(i_oMsg);
+			public void onMessage(ZMsg i_oMsg) {
+				m_oZmqHandler.getCommandHandler().sendZmsg(i_oMsg);
+			}
+		});     
+        m_oZmqHandler.getCommandHandler().setIncomingMessageListener(new ZmqMessageListener() {
+			
+			@Override
+			public void onMessage(ZMsg i_oMsg) {
+				m_oCmdHandler_External.sendZmsg(i_oMsg);
 			}
 		});
         

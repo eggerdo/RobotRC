@@ -4,7 +4,6 @@ import org.dobots.robotalk.client.R;
 import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.robots.romo.Romo;
 import org.dobots.robotalk.msg.VideoMessage;
-import org.dobots.robotalk.video.VideoHandler;
 import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.CameraPreview.CameraPreviewCallback;
@@ -29,14 +28,9 @@ public class RomoSensorGatherer extends SensorGatherer implements CameraPreviewC
 	public RomoSensorGatherer(BaseActivity i_oActivity, Romo i_oRomo) {
 		super(i_oActivity, "RomoSensorGatherer");
 		m_oRomo = i_oRomo;
-
-		m_strVideoAddr = "inproc://romo_video";
-
-		m_oVideoSocket = ZmqHandler.getInstance().getContext().createSocket(ZMQ.PUSH);
-		m_oVideoSocket.bind(m_strVideoAddr);
-
-		VideoHandler.getInstance().publishVideo(m_strVideoAddr);
 		
+		m_oVideoSocket = ZmqHandler.getInstance().obtainVideoSendSocket();
+
 		m_lblFPS = (TextView) i_oActivity.findViewById(R.id.lblFPS);
 		
 		start();
@@ -50,7 +44,7 @@ public class RomoSensorGatherer extends SensorGatherer implements CameraPreviewC
 	@Override
 	public void onFrame(byte[] rgb, int width, int height) {
 
-		VideoMessage vmsg = new VideoMessage(m_oRomo.getName(), rgb);
+		VideoMessage vmsg = new VideoMessage(m_oRomo.getID(), rgb);
 		ZMsg zmsg = vmsg.toZmsg();
 		zmsg.send(m_oVideoSocket);
 		
@@ -82,7 +76,6 @@ public class RomoSensorGatherer extends SensorGatherer implements CameraPreviewC
 
 	@Override
 	public void shutDown() {
-		VideoHandler.getInstance().unpublishVideo(m_strVideoAddr);
 		m_oVideoSocket.close();
 	}
 	

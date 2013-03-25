@@ -33,7 +33,7 @@ public class Romo extends DifferentialRobot {
 	}
 
 	@Override
-	public String getName() {
+	public String getID() {
 		return getType().toString();
 	}
 	
