@@ -1,17 +1,18 @@
 package org.dobots.robotalk.client.gui.robots.ac13;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.gui.robots.IConnectListener;
-import org.dobots.robotalk.client.gui.robots.SensorGatherer;
-import org.dobots.robotalk.client.gui.robots.WifiRobot;
 import org.dobots.robotalk.client.robots.ac13.AC13Rover;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.VideoResolution;
-import org.dobots.robotalk.control.RemoteControlHelper;
 import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.Utils;
 
-import robots.IRobotDevice;
+import robots.RobotRemoteListener;
 import robots.RobotType;
+import robots.ctrl.IRobotDevice;
+import robots.ctrl.RemoteControlHelper;
+import robots.gui.IConnectListener;
+import robots.gui.SensorGatherer;
+import robots.gui.WifiRobot;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -87,7 +88,8 @@ public class AC13RoverRobot extends WifiRobot {
 		m_oSensorGatherer = new AC13RoverSensorGatherer(this, m_oRover);
 		m_dblSpeed = m_oRover.getBaseSped();
 
-		m_oRemoteCtrl = new RemoteControlHelper(m_oActivity, m_oRover, null);
+		RobotRemoteListener oListener = new RobotRemoteListener(m_oRover);
+		m_oRemoteCtrl = new RemoteControlHelper(m_oActivity, oListener);
         m_oRemoteCtrl.setProperties();
 
         updateButtons(false);

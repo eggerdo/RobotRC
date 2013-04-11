@@ -7,16 +7,16 @@ import java.util.concurrent.Executors;
 
 import javax.security.auth.login.LoginException;
 
-import org.dobots.robotalk.client.gui.robots.MessageTypes;
-import org.dobots.robotalk.client.robots.DifferentialRobot;
-import org.dobots.robotalk.client.robots.IMoveRepeaterListener;
-import org.dobots.robotalk.client.robots.MoveRepeater;
-import org.dobots.robotalk.client.robots.MoveRepeater.MoveCommand;
 import org.dobots.robotalk.client.robots.spykee.SpykeeController.DockState;
 import org.dobots.robotalk.client.robots.spykee.SpykeeTypes.SpykeeSound;
 import org.dobots.utilities.Utils;
 
 import robots.RobotType;
+import robots.ctrl.DifferentialRobot;
+import robots.ctrl.IMoveRepeaterListener;
+import robots.ctrl.MoveRepeater;
+import robots.ctrl.MoveRepeater.MoveCommand;
+import robots.gui.MessageTypes;
 import android.os.Handler;
 import android.os.Message;
 
@@ -441,6 +441,12 @@ public class Spykee extends DifferentialRobot implements IMoveRepeaterListener {
 
 	public boolean isCharging() {
 		return getBatteryLevel() > 100;
+	}
+
+	@Override
+	public void toggleInvertDrive() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -38,7 +38,7 @@
 		    android:screenOrientation="portrait" ></activity>
 		<activity android:name="org.dobots.robotalk.client.gui.robots.spykee.SpykeeRobot"
 		    android:screenOrientation="portrait" ></activity>
-		<activity android:name="org.dobots.robotalk.client.gui.robots.romo.RomoRobot"
+		<activity android:name="robots.gui.romo.RomoRobot"
 		    android:screenOrientation="portrait" ></activity>
 		
     </application>

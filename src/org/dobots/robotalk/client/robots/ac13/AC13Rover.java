@@ -8,16 +8,16 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.dobots.robotalk.client.gui.robots.MessageTypes;
-import org.dobots.robotalk.client.robots.DifferentialRobot;
-import org.dobots.robotalk.client.robots.IMoveRepeaterListener;
-import org.dobots.robotalk.client.robots.MoveRepeater;
-import org.dobots.robotalk.client.robots.MoveRepeater.MoveCommand;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.AC13RoverParameters;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.VideoResolution;
 import org.dobots.utilities.Utils;
 
 import robots.RobotType;
+import robots.ctrl.DifferentialRobot;
+import robots.ctrl.IMoveRepeaterListener;
+import robots.ctrl.MoveRepeater;
+import robots.ctrl.MoveRepeater.MoveCommand;
+import robots.gui.MessageTypes;
 import android.os.Handler;
 
 public class AC13Rover extends DifferentialRobot implements IMoveRepeaterListener {
@@ -378,6 +378,12 @@ public class AC13Rover extends DifferentialRobot implements IMoveRepeaterListene
 	public byte[] getImageBuffer() {
 		return null;
 //		return m_oController.GetImageBuffer();
+	}
+
+	@Override
+	public void toggleInvertDrive() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

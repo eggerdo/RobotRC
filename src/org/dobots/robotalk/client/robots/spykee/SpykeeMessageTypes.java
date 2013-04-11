@@ -1,6 +1,6 @@
 package org.dobots.robotalk.client.robots.spykee;
 
-import org.dobots.robotalk.client.gui.robots.MessageTypes;
+import robots.gui.MessageTypes;
 
 public class SpykeeMessageTypes {
 

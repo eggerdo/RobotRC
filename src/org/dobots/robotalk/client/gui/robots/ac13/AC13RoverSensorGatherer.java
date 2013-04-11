@@ -1,11 +1,11 @@
 package org.dobots.robotalk.client.gui.robots.ac13;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.gui.robots.SensorGatherer;
 import org.dobots.robotalk.client.robots.ac13.AC13Rover;
 import org.dobots.robotalk.client.robots.ac13.AC13RoverTypes.VideoResolution;
 import org.dobots.robotalk.client.robots.ac13.IAC13VideoListener;
-import org.dobots.robotalk.msg.VideoMessage;
+import org.dobots.robotalk.msg.RawVideoMessage;
+import org.dobots.robotalk.msg.RobotVideoMessage;
 import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.ScalableImageView;
@@ -13,6 +13,8 @@ import org.dobots.utilities.Utils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZMsg;
+
+import robots.gui.SensorGatherer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -73,8 +75,9 @@ public class AC13RoverSensorGatherer extends SensorGatherer implements IAC13Vide
 	@Override
 	public void frameReceived(final Bitmap bmp) {
 		
-		VideoMessage msg = new VideoMessage(m_oRover.getType().toString(), bmp);
-		ZMsg zmsg = msg.toZmsg();
+		RawVideoMessage vmsg = new RawVideoMessage(m_oRover.getType().toString(), bmp, 0);
+		RobotVideoMessage oMsg = new RobotVideoMessage(vmsg.getRobotID(), vmsg.getHeader(), vmsg.getVideoData());
+		ZMsg zmsg = oMsg.toZmsg();
 		zmsg.send(videoSocket);
 
 		if (m_bVideoEnabled) {

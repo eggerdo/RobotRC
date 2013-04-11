@@ -3,11 +3,6 @@
 
     <string name="app_name">RoboTalk-Client</string>
     
-    <string name="btn_control_fwd">Fwd</string>    
-    <string name="btn_control_left">Left</string>    
-    <string name="btn_control_bwd">Bwd</string>    
-    <string name="btn_control_right">Right</string> 
-
     <string name="connecting_please_wait">Connecting to the robot.\nPlease wait...</string>
      
     <!--  AC13 Rover -->

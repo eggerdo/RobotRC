@@ -1,7 +1,6 @@
 package org.dobots.robotalk.client;
 
 
-import org.dobots.robotalk.client.gui.robots.RobotViewFactory;
 import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.robotalk.zmq.ZmqMessageHandler;
 import org.dobots.robotalk.zmq.ZmqMessageHandler.ZmqMessageListener;
@@ -11,7 +10,11 @@ import org.dobots.utilities.Utils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 
+import robots.RobotInventory;
 import robots.RobotType;
+import robots.ctrl.IRobotDevice;
+import robots.ctrl.RobotDeviceFactory;
+import robots.gui.RobotViewFactory;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -38,6 +41,8 @@ public class RoboTalkActivity_Client extends Activity {
 	
 
 	private ZmqMessageHandler m_oVideoHandler_External;
+	
+	private ZmqMessageHandler m_oVideoHandler_Base64;
 		
 	private ZmqHandler m_oZmqHandler;
 	ZmqSettings m_oSettings;
@@ -46,6 +51,13 @@ public class RoboTalkActivity_Client extends Activity {
 	private Button m_btnConnect;
 
 	private ZmqMessageHandler m_oCmdHandler_External;
+
+	private String m_strCommandSendAddress;
+	private String m_strCommandReceiveAddress;
+	private String m_strVideoSendAddress;
+	private String m_strVideoRecvAddress;
+
+	private boolean m_bRemote;
 
     /** Called when the activity is first created. */
     @Override
@@ -65,11 +77,18 @@ public class RoboTalkActivity_Client extends Activity {
 			@Override
 			public void onChange() {
 				closeConnections();
-				setupConnections();
+	        	setupConnections(m_oSettings.isRemote());
+			}
+
+			@Override
+			public void onCancel() {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 
         m_oVideoHandler_External = new ZmqMessageHandler();
+        m_oVideoHandler_Base64 = new ZmqMessageHandler();
 
         m_oCmdHandler_External = new ZmqMessageHandler();
         
@@ -81,34 +100,52 @@ public class RoboTalkActivity_Client extends Activity {
 		
 //		showRobot(RobotType.RBT_SPYKEE);
 
-		if (m_oSettings.isValid()) {
-	        setupConnections();
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+        	getConnectionFromBundle(extras);
+        	setupConnections(m_bRemote);
+        } else if (m_oSettings.isValid()) {
+        	setupConnections(m_oSettings.isRemote());
 			showRobot(RobotType.RBT_ROMO);
 		}
+    }
+    
+    private void getConnectionFromBundle(Bundle i_oBundle) {
+    	m_strCommandReceiveAddress = i_oBundle.getString("command_recv_address");
+    	m_strCommandSendAddress = i_oBundle.getString("command_send_address");
+    	m_strVideoRecvAddress = i_oBundle.getString("video_recv_address");
+    	m_strVideoSendAddress = i_oBundle.getString("video_send_address");
+    	m_bRemote = i_oBundle.getBoolean("remote");
     }
 
 	private void closeConnections() {
 		m_oVideoHandler_External.closeConnections();
+		m_oVideoHandler_Base64.closeConnections();
 		m_oCmdHandler_External.closeConnections();
 	}
 
-	private void setupConnections() {
-		setupVideoConnection();
-		setupCommandConnection();
+	private void setupConnections(boolean i_bRemote) {
+		setupVideoConnection(i_bRemote);
+		setupCommandConnection(i_bRemote);
 	}
-	
-	private void setupVideoConnection() {
+
+	private void setupVideoConnection(boolean i_bRemote) {
 		ZMQ.Socket oVideoSender = m_oZmqHandler.createSocket(ZMQ.PUB);
 
-		// obtain video ports from settings
-		// receive port is always equal to send port + 1
-		int nVideoSendPort = m_oSettings.getVideoPort();
-		
 		// set the output queue size down, we don't really want to have old video frames displayed
 		// we only want the most recent ones
 		oVideoSender.setHWM(20);
 
-		oVideoSender.connect(String.format("tcp://%s:%d", m_oSettings.getAddress(), nVideoSendPort));
+		if (i_bRemote) {
+			oVideoSender.connect(getVideoSendAddress());
+		} else {
+			try {
+				oVideoSender.bind(getVideoSendAddress());
+			} catch (Exception e) {
+				Utils.showToast("Video Port is already taken", Toast.LENGTH_LONG);
+				return;
+			}
+		}
 
 		m_oVideoHandler_External.setupConnections(null, oVideoSender);
 
@@ -128,16 +165,119 @@ public class RoboTalkActivity_Client extends Activity {
 				m_oVideoHandler_External.sendZmsg(i_oMsg);
 			}
 		});
+        
+		ZMQ.Socket oVideoSenderBase64 = m_oZmqHandler.createSocket(ZMQ.PUB);
+
+		// set the output queue size down, we don't really want to have old video frames displayed
+		// we only want the most recent ones
+		oVideoSenderBase64.setHWM(20);
+
+//		if (i_bRemote) {
+//			oVideoSender.connect(getVideoSendAddress());
+//		} else {
+//			try {
+//				oVideoSender.bind(getVideoSendAddress());
+//			} catch (Exception e) {
+//				Utils.showToast("Video Port is already taken", Toast.LENGTH_LONG);
+//				return;
+//			}
+//		}
+		
+		String strAddress = String.format("tcp://%s:%d", m_oZmqHandler.getInstance().getSettings().getAddress(), 4030); 
+		oVideoSenderBase64.connect(strAddress);
+		
+        m_oVideoHandler_Base64.setupConnections(null, oVideoSenderBase64);
+        
+        m_oVideoHandler_Base64.setIncomingMessageListener(new ZmqMessageListener() {
+			
+			@Override
+			public void onMessage(ZMsg i_oMsg) {
+				m_oZmqHandler.getVideoBase64Handler().sendZmsg(i_oMsg);
+			}
+		});
+        m_oZmqHandler.getVideoBase64Handler().setIncomingMessageListener(new ZmqMessageListener() {
+			
+			@Override
+			public void onMessage(ZMsg i_oMsg) {
+				m_oVideoHandler_Base64.sendZmsg(i_oMsg);
+			}
+		});
+	}
+
+	private String getVideoReceiveAddress() {
+		
+		if (m_strVideoRecvAddress != null) {
+			return m_strVideoRecvAddress;
+		} else {
+			// obtain command ports from settings
+			// receive port is always equal to send port + 1
+			int nVideoRecvPort = m_oSettings.getVideoPort() + 1;
+
+			return assembleAddress(m_oSettings.isRemote(), nVideoRecvPort);
+		}
+	}
+
+	private String getVideoSendAddress() {
+		
+		if (m_strVideoSendAddress != null) {
+			return m_strVideoSendAddress;
+		} else {
+			// obtain command ports from settings
+			// receive port is always equal to send port + 1
+			int nVideoSendPort = m_oSettings.getVideoPort();
+
+			return assembleAddress(m_oSettings.isRemote(), nVideoSendPort);
+		}
 	}
 	
-	private void setupCommandConnection() {
+	private String getCommandReceiveAddress() {
+		
+		if (m_strCommandReceiveAddress != null) {
+			return m_strCommandReceiveAddress;
+		} else {
+			// obtain command ports from settings
+			// receive port is always equal to send port + 1
+			int nCommandRecvPort = m_oSettings.getCommandPort() + 1;
+
+			return assembleAddress(m_oSettings.isRemote(), nCommandRecvPort);
+		}
+	}
+
+	private String getCommandSendAddress() {
+		
+		if (m_strCommandSendAddress != null) {
+			return m_strCommandSendAddress;
+		} else {
+			// obtain command ports from settings
+			// receive port is always equal to send port + 1
+			int nCommandSendPort = m_oSettings.getCommandPort();
+			
+			return assembleAddress(m_oSettings.isRemote(), nCommandSendPort);
+		}
+	}
+	
+	private String assembleAddress(boolean i_bRemote, int i_nPort) {
+		if (i_bRemote) {
+			return String.format("tcp://%s:%d", m_oSettings.getAddress(), i_nPort);
+		} else {
+			return String.format("tcp://127.0.0.1:%d", i_nPort);
+		}
+	}
+	
+	private void setupCommandConnection(boolean i_bRemote) {
 		ZMQ.Socket oCommandReceiver = m_oZmqHandler.createSocket(ZMQ.SUB);
 
-		// obtain command ports from settings
-		// receive port is always equal to send port + 1
-		int nCommandRecvPort = m_oSettings.getCommandPort() + 1;
-		
-		oCommandReceiver.connect(String.format("tcp://%s:%d", m_oSettings.getAddress(), nCommandRecvPort));
+		if (i_bRemote) {
+			oCommandReceiver.connect(getCommandReceiveAddress());
+		} else {
+			try {
+				oCommandReceiver.bind(getCommandReceiveAddress());
+			} catch (Exception e) {
+				Utils.showToast("Video Port is already taken", Toast.LENGTH_LONG);
+				return;
+			}
+		}
+
 		oCommandReceiver.subscribe("".getBytes());
 		
 		m_oCmdHandler_External.setupConnections(oCommandReceiver, null);
@@ -181,7 +321,7 @@ public class RoboTalkActivity_Client extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				if (m_oZmqHandler.getSettings().isValid()) {
-			        setupConnections();
+//		        	setupConnections(m_oSettings.isRemote(), null, null);
 					showRobot(RobotType.RBT_ROMO);
 				} else {
 					Utils.showToast("Zmq Settings invalid", Toast.LENGTH_LONG);
@@ -192,9 +332,27 @@ public class RoboTalkActivity_Client extends Activity {
     }
 
 	public void showRobot(RobotType i_eType) {
+		try {
+			String i_strRobotID = createRobot(i_eType);
+			createRobotView(i_eType, i_strRobotID);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void createRobotView(RobotType i_eType, String i_strRobotID) {
 		Intent intent = new Intent(RoboTalkActivity_Client.this, RobotViewFactory.getRobotViewClass(i_eType));
 		intent.putExtra("RobotType", i_eType);
+		intent.putExtra("RobotID", i_strRobotID);
+		intent.putExtra("OwnsRobot", true);
 		startActivity(intent);
+	}
+	
+	public String createRobot(RobotType i_eType) throws Exception {
+		IRobotDevice oRobot = RobotDeviceFactory.createRobotDevice(i_eType);
+		String i_strRobotID = RobotInventory.getInstance().addRobot(oRobot);
+		return i_strRobotID;
 	}
 
 	public static Activity getActivity() {

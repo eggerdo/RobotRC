@@ -19,21 +19,21 @@
 package org.dobots.robotalk.client.gui.robots.spykee;
 
 import org.dobots.robotalk.client.R;
-import org.dobots.robotalk.client.gui.robots.IConnectListener;
-import org.dobots.robotalk.client.gui.robots.SensorGatherer;
-import org.dobots.robotalk.client.gui.robots.WifiRobot;
 import org.dobots.robotalk.client.robots.spykee.Spykee;
 import org.dobots.robotalk.client.robots.spykee.SpykeeController.DockState;
 import org.dobots.robotalk.client.robots.spykee.SpykeeMessageTypes;
 import org.dobots.robotalk.client.robots.spykee.SpykeeTypes;
 import org.dobots.robotalk.client.robots.spykee.SpykeeTypes.SpykeeSound;
-import org.dobots.robotalk.control.IRemoteControlListener;
-import org.dobots.robotalk.control.RemoteControlHelper;
 import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.Utils;
 
-import robots.IRobotDevice;
 import robots.RobotType;
+import robots.ctrl.IRemoteControlListener;
+import robots.ctrl.IRobotDevice;
+import robots.ctrl.RemoteControlHelper;
+import robots.gui.IConnectListener;
+import robots.gui.SensorGatherer;
+import robots.gui.WifiRobot;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -132,7 +132,7 @@ public class SpykeeRobot extends WifiRobot implements IRemoteControlListener {
 		m_oSensorGatherer = new SpykeeSensorGatherer(this, m_oSpykee);
 		m_dblSpeed = m_oSpykee.getBaseSped();
 
-		m_oRemoteCtrl = new RemoteControlHelper(m_oActivity, m_oSpykee, this);
+		m_oRemoteCtrl = new RemoteControlHelper(m_oActivity, this);
         m_oRemoteCtrl.setProperties();
 
         updateButtons(false);
@@ -506,6 +506,12 @@ public class SpykeeRobot extends WifiRobot implements IRemoteControlListener {
 		m_oRemoteCtrl.enableControl(i_bEnable);
 		
 		Utils.showLayout(m_layControls, i_bEnable);
+	}
+
+	@Override
+	public void toggleInvertDrive() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

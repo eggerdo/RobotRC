@@ -32,12 +32,14 @@ import java.net.UnknownHostException;
 
 import javax.security.auth.login.LoginException;
 
-import org.dobots.robotalk.client.gui.robots.MessageTypes;
-import org.dobots.robotalk.msg.VideoMessage;
+import org.dobots.robotalk.msg.RawVideoMessage;
+import org.dobots.robotalk.msg.RobotVideoMessage;
 import org.dobots.robotalk.zmq.ZmqHandler;
 import org.dobots.utilities.log.Loggable;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
+
+import robots.gui.MessageTypes;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -501,8 +503,9 @@ public class SpykeeController extends Loggable {
 						msg.obj = bitmap;
 						mHandler.sendMessage(msg);
 						
-						VideoMessage vmsg = new VideoMessage("Spykee", frame);
-						ZMsg zmsg = vmsg.toZmsg();
+						RawVideoMessage vmsg = new RawVideoMessage("Spykee", frame, 0);
+						RobotVideoMessage oMsg = new RobotVideoMessage(vmsg.getRobotID(), vmsg.getHeader(), vmsg.getVideoData());
+						ZMsg zmsg = oMsg.toZmsg();
 						zmsg.send(videoSocket);
 						
 						break;
