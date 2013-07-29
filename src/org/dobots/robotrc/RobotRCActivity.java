@@ -1,19 +1,20 @@
-package org.dobots.robotalk.client;
+package org.dobots.robotrc;
 
 
-import org.dobots.robotalk.zmq.ZmqHandler;
-import org.dobots.robotalk.zmq.ZmqMessageHandler;
-import org.dobots.robotalk.zmq.ZmqMessageHandler.ZmqMessageListener;
-import org.dobots.robotalk.zmq.ZmqSettings;
-import org.dobots.robotalk.zmq.ZmqSettings.SettingsChangeListener;
+import org.dobots.communication.zmq.ZmqHandler;
+import org.dobots.communication.zmq.ZmqMessageHandler;
+import org.dobots.communication.zmq.ZmqMessageHandler.ZmqMessageListener;
+import org.dobots.communication.zmq.ZmqSettings;
+import org.dobots.communication.zmq.ZmqSettings.SettingsChangeListener;
 import org.dobots.utilities.Utils;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 
-import robots.RobotInventory;
 import robots.RobotType;
 import robots.ctrl.IRobotDevice;
 import robots.ctrl.RobotDeviceFactory;
+import robots.gui.RobotInventory;
+import robots.gui.RobotLaunchHelper;
 import robots.gui.RobotViewFactory;
 import android.app.Activity;
 import android.app.Dialog;
@@ -28,7 +29,7 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class RoboTalkActivity_Client extends Activity {
+public class RobotRCActivity extends Activity {
 
 	private static final String TAG = "RoboTalk";
 
@@ -98,15 +99,13 @@ public class RoboTalkActivity_Client extends Activity {
 				powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK,
 						"Full Wake Lock");
 		
-//		showRobot(RobotType.RBT_SPYKEE);
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
         	getConnectionFromBundle(extras);
         	setupConnections(m_bRemote);
         } else if (m_oSettings.isValid()) {
         	setupConnections(m_oSettings.isRemote());
-			showRobot(RobotType.RBT_ROMO);
+        	RobotLaunchHelper.showRobot(CONTEXT, RobotType.RBT_ROVER2);
 		}
     }
     
@@ -151,14 +150,14 @@ public class RoboTalkActivity_Client extends Activity {
 
 		// link external with internal command handler. incoming commands in external are sent to
 		// internal, incoming commands on internal are sent to external
-		m_oVideoHandler_External.setIncomingMessageListener(new ZmqMessageListener() {
+		m_oVideoHandler_External.addIncomingMessageListener(new ZmqMessageListener() {
 			
 			@Override
 			public void onMessage(ZMsg i_oMsg) {
 				m_oZmqHandler.getVideoHandler().sendZmsg(i_oMsg);
 			}
 		}); 
-        m_oZmqHandler.getVideoHandler().setIncomingMessageListener(new ZmqMessageListener() {
+        m_oZmqHandler.getVideoHandler().addIncomingMessageListener(new ZmqMessageListener() {
 			
 			@Override
 			public void onMessage(ZMsg i_oMsg) {
@@ -166,102 +165,118 @@ public class RoboTalkActivity_Client extends Activity {
 			}
 		});
         
-		ZMQ.Socket oVideoSenderBase64 = m_oZmqHandler.createSocket(ZMQ.PUB);
-
-		// set the output queue size down, we don't really want to have old video frames displayed
-		// we only want the most recent ones
-		oVideoSenderBase64.setHWM(20);
-
-//		if (i_bRemote) {
-//			oVideoSender.connect(getVideoSendAddress());
-//		} else {
-//			try {
-//				oVideoSender.bind(getVideoSendAddress());
-//			} catch (Exception e) {
-//				Utils.showToast("Video Port is already taken", Toast.LENGTH_LONG);
-//				return;
+//		ZMQ.Socket oVideoSenderBase64 = m_oZmqHandler.createSocket(ZMQ.PUB);
+//
+//		// set the output queue size down, we don't really want to have old video frames displayed
+//		// we only want the most recent ones
+//		oVideoSenderBase64.setHWM(20);
+//
+////		if (i_bRemote) {
+////			oVideoSender.connect(getVideoSendAddress());
+////		} else {
+////			try {
+////				oVideoSender.bind(getVideoSendAddress());
+////			} catch (Exception e) {
+////				Utils.showToast("Video Port is already taken", Toast.LENGTH_LONG);
+////				return;
+////			}
+////		}
+//		
+//		String strAddress = String.format("tcp://%s:%d", m_oZmqHandler.getInstance().getSettings().getAddress(), 4030); 
+//		oVideoSenderBase64.connect(strAddress);
+//		
+//        m_oVideoHandler_Base64.setupConnections(null, oVideoSenderBase64);
+//        
+//        m_oVideoHandler_Base64.setIncomingMessageListener(new ZmqMessageListener() {
+//			
+//			@Override
+//			public void onMessage(ZMsg i_oMsg) {
+//				m_oZmqHandler.getVideoBase64Handler().sendZmsg(i_oMsg);
 //			}
+//		});
+//        m_oZmqHandler.getVideoBase64Handler().setIncomingMessageListener(new ZmqMessageListener() {
+//			
+//			@Override
+//			public void onMessage(ZMsg i_oMsg) {
+//				m_oVideoHandler_Base64.sendZmsg(i_oMsg);
+//			}
+//		});
+	}
+
+	public String getVideoReceiveAddress() {
+		
+//		if (m_strVideoRecvAddress == null) {
+			// obtain command ports from settings
+			// receive port is always equal to send port + 1
+			int nVideoRecvPort;
+			if (m_oSettings.isRemote()) {
+				nVideoRecvPort = m_oSettings.getVideoPort() + 1;
+			} else {
+				nVideoRecvPort = m_oSettings.getVideoPort();
+			}
+
+			m_strVideoRecvAddress = assembleAddress(m_oSettings.isRemote(), nVideoRecvPort);
 //		}
-		
-		String strAddress = String.format("tcp://%s:%d", m_oZmqHandler.getInstance().getSettings().getAddress(), 4030); 
-		oVideoSenderBase64.connect(strAddress);
-		
-        m_oVideoHandler_Base64.setupConnections(null, oVideoSenderBase64);
-        
-        m_oVideoHandler_Base64.setIncomingMessageListener(new ZmqMessageListener() {
-			
-			@Override
-			public void onMessage(ZMsg i_oMsg) {
-				m_oZmqHandler.getVideoBase64Handler().sendZmsg(i_oMsg);
-			}
-		});
-        m_oZmqHandler.getVideoBase64Handler().setIncomingMessageListener(new ZmqMessageListener() {
-			
-			@Override
-			public void onMessage(ZMsg i_oMsg) {
-				m_oVideoHandler_Base64.sendZmsg(i_oMsg);
-			}
-		});
+		return m_strVideoRecvAddress;
 	}
 
-	private String getVideoReceiveAddress() {
+	public String getVideoSendAddress() {
 		
-		if (m_strVideoRecvAddress != null) {
-			return m_strVideoRecvAddress;
-		} else {
+//		if (m_strVideoSendAddress == null) {
 			// obtain command ports from settings
 			// receive port is always equal to send port + 1
-			int nVideoRecvPort = m_oSettings.getVideoPort() + 1;
+			int nVideoSendPort;
+			if (m_oSettings.isRemote()) {
+				nVideoSendPort = m_oSettings.getVideoPort();
+			} else {
+				nVideoSendPort = m_oSettings.getVideoPort() + 1;
+			}
 
-			return assembleAddress(m_oSettings.isRemote(), nVideoRecvPort);
-		}
-	}
-
-	private String getVideoSendAddress() {
-		
-		if (m_strVideoSendAddress != null) {
-			return m_strVideoSendAddress;
-		} else {
-			// obtain command ports from settings
-			// receive port is always equal to send port + 1
-			int nVideoSendPort = m_oSettings.getVideoPort();
-
-			return assembleAddress(m_oSettings.isRemote(), nVideoSendPort);
-		}
+			m_strVideoSendAddress = assembleAddress(m_oSettings.isRemote(), nVideoSendPort);
+//		}
+		return m_strVideoSendAddress;
 	}
 	
-	private String getCommandReceiveAddress() {
+	public String getCommandReceiveAddress() {
 		
-		if (m_strCommandReceiveAddress != null) {
-			return m_strCommandReceiveAddress;
-		} else {
+//		if (m_strCommandReceiveAddress == null) {
 			// obtain command ports from settings
 			// receive port is always equal to send port + 1
-			int nCommandRecvPort = m_oSettings.getCommandPort() + 1;
+			int nCommandRecvPort;
+			if (m_oSettings.isRemote()) {
+				nCommandRecvPort = m_oSettings.getCommandPort() + 1;
+			} else {
+				nCommandRecvPort = m_oSettings.getCommandPort();
+			}
 
-			return assembleAddress(m_oSettings.isRemote(), nCommandRecvPort);
-		}
+			m_strCommandReceiveAddress = assembleAddress(m_oSettings.isRemote(), nCommandRecvPort);
+//		}
+		return m_strCommandReceiveAddress;
 	}
 
-	private String getCommandSendAddress() {
+	public String getCommandSendAddress() {
 		
-		if (m_strCommandSendAddress != null) {
-			return m_strCommandSendAddress;
-		} else {
+//		if (m_strCommandSendAddress == null) {
 			// obtain command ports from settings
 			// receive port is always equal to send port + 1
-			int nCommandSendPort = m_oSettings.getCommandPort();
+			int nCommandSendPort;
+			if (m_oSettings.isRemote()) {
+				nCommandSendPort = m_oSettings.getCommandPort();
+			} else {
+				nCommandSendPort = m_oSettings.getCommandPort() + 1;
+			}
 			
-			return assembleAddress(m_oSettings.isRemote(), nCommandSendPort);
-		}
+			m_strCommandSendAddress = assembleAddress(m_oSettings.isRemote(), nCommandSendPort);
+//		}
+		return m_strCommandSendAddress;
 	}
 	
-	private String assembleAddress(boolean i_bRemote, int i_nPort) {
-		if (i_bRemote) {
+	public String assembleAddress(boolean i_bRemote, int i_nPort) {
+//		if (i_bRemote) {
 			return String.format("tcp://%s:%d", m_oSettings.getAddress(), i_nPort);
-		} else {
-			return String.format("tcp://127.0.0.1:%d", i_nPort);
-		}
+//		} else {
+//			return String.format("tcp://127.0.0.1:%d", i_nPort);
+//		}
 	}
 	
 	private void setupCommandConnection(boolean i_bRemote) {
@@ -284,14 +299,14 @@ public class RoboTalkActivity_Client extends Activity {
 		
 		// link external with internal command handler. incoming commands in external are sent to
 		// internal, incoming commands on internal are sent to external
-        m_oCmdHandler_External.setIncomingMessageListener(new ZmqMessageListener() {
+        m_oCmdHandler_External.addIncomingMessageListener(new ZmqMessageListener() {
 			
 			@Override
 			public void onMessage(ZMsg i_oMsg) {
 				m_oZmqHandler.getCommandHandler().sendZmsg(i_oMsg);
 			}
 		});     
-        m_oZmqHandler.getCommandHandler().setIncomingMessageListener(new ZmqMessageListener() {
+        m_oZmqHandler.getCommandHandler().addIncomingMessageListener(new ZmqMessageListener() {
 			
 			@Override
 			public void onMessage(ZMsg i_oMsg) {
@@ -322,7 +337,8 @@ public class RoboTalkActivity_Client extends Activity {
 			public void onClick(View arg0) {
 				if (m_oZmqHandler.getSettings().isValid()) {
 //		        	setupConnections(m_oSettings.isRemote(), null, null);
-					showRobot(RobotType.RBT_ROMO);
+					RobotLaunchHelper.showRobot(CONTEXT, RobotType.RBT_ROVER2);
+//					showRobot(RobotType.RBT_ROMO);
 				} else {
 					Utils.showToast("Zmq Settings invalid", Toast.LENGTH_LONG);
 				}
@@ -330,30 +346,6 @@ public class RoboTalkActivity_Client extends Activity {
 		});
         
     }
-
-	public void showRobot(RobotType i_eType) {
-		try {
-			String i_strRobotID = createRobot(i_eType);
-			createRobotView(i_eType, i_strRobotID);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void createRobotView(RobotType i_eType, String i_strRobotID) {
-		Intent intent = new Intent(RoboTalkActivity_Client.this, RobotViewFactory.getRobotViewClass(i_eType));
-		intent.putExtra("RobotType", i_eType);
-		intent.putExtra("RobotID", i_strRobotID);
-		intent.putExtra("OwnsRobot", true);
-		startActivity(intent);
-	}
-	
-	public String createRobot(RobotType i_eType) throws Exception {
-		IRobotDevice oRobot = RobotDeviceFactory.createRobotDevice(i_eType);
-		String i_strRobotID = RobotInventory.getInstance().addRobot(oRobot);
-		return i_strRobotID;
-	}
 
 	public static Activity getActivity() {
 		return CONTEXT;

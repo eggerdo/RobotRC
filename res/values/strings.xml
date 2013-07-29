@@ -1,33 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">RoboTalk-Client</string>
+    <string name="app_name">Robot RC</string>
     
-    <string name="connecting_please_wait">Connecting to the robot.\nPlease wait...</string>
-     
-    <!--  AC13 Rover -->
-    <string name="ac13rover_title">AC13 Rover</string>
-    <string name="ac13rover_commands">AC13 Rover Commands</string>
-    <string name="ar13rover_infrared">Infrared</string>
-    <string name="ac13rover_res640x480">640 x 480</string>
-    <string name="ac13rover_res320x240">320 x 240</string>
-  
-    <!--  Spykee -->
-    <string name="spykee_title">Spykee</string>
-    <string name="spykee_commands">Spykee Commands</string>
-    <string name="spykee_canceldock">Cancel Dock</string>
-    <string name="spykee_dock">Dock</string>
-    <string name="spykee_undock">Undock</string>
-    <string name="spykee_battery">Battery</string>
-    <string name="spykee_dockingstate">Docking State</string>
-    <string name="spykee_port">Port</string>
-    <string name="spykee_address">Address</string>
-    <string name="spykee_login">Login</string>
-    <string name="spykee_password">Password</string>
-    <string name="spykee_led1">Led 1</string>
-    <string name="spykee_led2">Led 2</string>
-    <string name="spykee_led3">Led 3</string>
-    <string name="spykee_play">Play</string>
-    
-    
+    <string name="intro">This app provides two applications. 1) ZMQ remote control features for robots. 
+        It connects to the robot and listens to incoming remote control commands over ZMQ. In return, 
+        the video stream received from the robot is sent over ZMQ. To be used with the robot server 
+        (https://github.com/eggerdo/robot_server.node). 2) User interface to remote control a robot
+        over ZMQ. Controls are sent over ZMQ to the robot server and video stream is received and displayed</string>
+        
 </resources>
