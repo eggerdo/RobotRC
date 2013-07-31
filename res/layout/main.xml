@@ -1,49 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.dobots.utilities.LockableScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollview"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="fill" >
+    android:orientation="vertical" >
 
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/intro"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="10dp" />
+    
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
-
-        <View
-            android:id="@+id/spacer1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:minHeight="20dp" />
-
-        <Button
-            android:id="@+id/btnConnect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Connect Robot" />
-
-        <View
-            android:id="@+id/spacer2"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:minHeight="20dp" />
-
-        <Button
-            android:id="@+id/btnZMQSettings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="ZMQ Settings" />
-
-        <View
-            android:id="@+id/spacer3"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:minHeight="20dp" />
-        
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal" >
+    
+	    <ImageButton
+	        android:id="@+id/btnRobot"
+	        android:layout_width="0dp"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_weight="1"
+	        android:background="@android:drawable/btn_default"
+	        android:padding="30dp"
+	        android:scaleType="centerInside"
+	        android:src="@drawable/robot" />
+	
+	    <ImageButton
+	        android:id="@+id/btnUser"
+	        android:layout_width="0dp"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_weight="1"
+	        android:background="@android:drawable/btn_default"
+	        android:scaleType="centerInside"
+	        android:src="@drawable/rc" />
+    
     </LinearLayout>
+	    
+</LinearLayout>
 
-</org.dobots.utilities.LockableScrollView>

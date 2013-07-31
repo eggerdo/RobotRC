@@ -21,6 +21,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
     <application
+        android:name="org.dobots.utilities.BaseApplication"
         android:allowBackup="true"
         android:icon="@drawable/robotrc_icon"
         android:label="@string/app_name" >
@@ -36,11 +37,18 @@
             </intent-filter>
         </activity>
         
+		<activity android:name=".RobotRC_Robot"
+		    android:screenOrientation="portrait" ></activity>
+		<activity android:name=".RobotRC_User"
+		    android:screenOrientation="portrait" ></activity>
+        
 		<activity android:name="robots.romo.gui.RomoRobot"
 		    android:screenOrientation="portrait" ></activity>
 		<activity android:name="robots.rover.rover2.gui.Rover2Robot"
 		    android:screenOrientation="portrait" ></activity>
 		<activity android:name="robots.rover.ac13.gui.AC13RoverRobot"
+		    android:screenOrientation="portrait" ></activity>
+		<activity android:name="robots.spytank.gui.SpyTankRobot"
 		    android:screenOrientation="portrait" ></activity>
 		
     </application>
