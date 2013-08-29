@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class RobotRC_User extends ZmqActivity {
@@ -31,7 +32,7 @@ public class RobotRC_User extends ZmqActivity {
 	private VideoDisplayThread m_oVideoDisplayer;
 	private boolean m_bVideoStopped;
 	private boolean m_bVideoConnected;
-	private FrameLayout m_layVideo;
+	private LinearLayout m_layVideo;
 	
 	private VideoHelper mVideoHelper;
 	
@@ -47,9 +48,12 @@ public class RobotRC_User extends ZmqActivity {
 		// don't know the robot id yet
     	m_oZmqRemoteListener = new ZmqRemoteListener("");
 		m_oRemoteCtrl = new ZmqRemoteControlHelper(this, m_oZmqRemoteListener);
-        m_oRemoteCtrl.setProperties();
 
 		setupVideoDisplay();
+		
+		if (savedInstanceState != null) {
+			m_oRemoteCtrl.setJoystickControl(savedInstanceState.getBoolean("joystick"));
+		}
 		
 	}
 	
@@ -58,8 +62,15 @@ public class RobotRC_User extends ZmqActivity {
 		setContentView(R.layout.robotrc_user);
 		getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		m_layVideo = (FrameLayout) findViewById(R.id.layDisplay);
+		m_layVideo = (LinearLayout) findViewById(R.id.layVideo);
 
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean("joystick", m_oRemoteCtrl.isJoystickControl());
+
+		super.onSaveInstanceState(outState);
 	}
 	
 	@Override
@@ -71,12 +82,24 @@ public class RobotRC_User extends ZmqActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
+//		stopVideo();
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
 		stopVideo();
 	}
 	
 	@Override
 	protected void onRestart() {
 		super.onRestart();
+//		startVideo();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
 		startVideo();
 	}
 
@@ -96,7 +119,7 @@ public class RobotRC_User extends ZmqActivity {
 
         mVideoHelper = new VideoHelper(this, m_layVideo);
         
-        startVideo();
+//        startVideo();
 	}
     
     ZMQ.Socket oVideoRecvSocket;
@@ -107,16 +130,23 @@ public class RobotRC_User extends ZmqActivity {
 		
 		// start a video display thread which receives video frames from the socket and displays them
 		m_oVideoDisplayer = new VideoDisplayThread(ZmqHandler.getInstance().getContext().getContext(), oVideoRecvSocket);
-		m_oVideoDisplayer.setVideoListener(mVideoHelper);
+		m_oVideoDisplayer.setRawVideoListner(mVideoHelper);
 		m_oVideoDisplayer.setFPSListener(mVideoHelper);
 		m_oVideoDisplayer.start();
+		
+		mVideoHelper.onStartVideo(false);
     }
     
     private void stopVideo() {
+    	
 		if (m_oVideoDisplayer != null) {
+			m_oVideoDisplayer.setVideoListener(null);
 			m_oVideoDisplayer.close();
 			m_oVideoDisplayer = null;
 		}
+
+    	mVideoHelper.onStopVideo();
+    	
 		oVideoRecvSocket.close();
 		oVideoRecvSocket = null;
     }

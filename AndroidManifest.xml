@@ -39,8 +39,7 @@
         
 		<activity android:name=".RobotRC_Robot"
 		    android:screenOrientation="portrait" ></activity>
-		<activity android:name=".RobotRC_User"
-		    android:screenOrientation="portrait" ></activity>
+		<activity android:name=".RobotRC_User"></activity>
         
 		<activity android:name="robots.romo.gui.RomoRobot"
 		    android:screenOrientation="portrait" ></activity>

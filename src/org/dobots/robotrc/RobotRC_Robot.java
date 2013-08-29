@@ -27,7 +27,7 @@ public class RobotRC_Robot extends ZmqActivity {
 	
 	private ZmqConnectionHelper m_oZmqCoordinator;
 	
-	private RobotType[] mRobotList = {RobotType.RBT_ROMO, RobotType.RBT_ROVER2, RobotType.RBT_SPYTANK};
+	private RobotType[] mRobotList = {RobotType.RBT_ROMO, RobotType.RBT_AC13ROVER, RobotType.RBT_ROVER2, RobotType.RBT_SPYTANK};
 	private boolean mAutoConnect;
 	private RobotType mSelectedRobot;
 	

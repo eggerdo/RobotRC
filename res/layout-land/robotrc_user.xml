@@ -6,39 +6,40 @@
     
     <LinearLayout 
         android:id="@+id/layVideoContainer"
+        android:baselineAligned="false"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
-    	android:orientation="vertical" >
+    	android:orientation="horizontal" >
            
 	    <LinearLayout 
 	        android:id="@+id/layVideo"
-		    android:layout_width="match_parent"
-		    android:layout_height="0dp"
-		    android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
 	    	android:orientation="vertical" />
            
 	    <LinearLayout 
 	        android:id="@+id/layVideoSpacer"
-		    android:layout_width="match_parent"
-		    android:layout_height="0dp"
-		    android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
 	    	android:orientation="vertical" />
                 
     </LinearLayout>
      
     <LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-    	android:orientation="vertical" >
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal" >
     	
         <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
             android:layout_weight="1" />
         
 		<include
-		    android:layout_width="match_parent"
-		    android:layout_height="0dp"
+		    android:layout_height="match_parent"
+		    android:layout_width="0dp"
 		    android:layout_weight="1"
 		    layout="@layout/remote_control" />
         

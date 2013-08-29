@@ -72,6 +72,10 @@ public class RobotRCActivity extends Activity {
         if (!m_oSettings.checkSettings()) {
         	m_oSettings.showDialog(this);
         }
+        
+
+//		Intent intent = new Intent(RobotRCActivity.this, RobotRC_User.class);
+//		startActivity(intent);
     }
     
     @Override

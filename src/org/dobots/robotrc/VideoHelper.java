@@ -1,13 +1,18 @@
 package org.dobots.robotrc;
 
 import org.dobots.communication.video.IFpsListener;
+import org.dobots.communication.video.IRawVideoListener;
 import org.dobots.communication.video.IVideoListener;
 import org.dobots.utilities.ScalableImageView;
+import org.dobots.utilities.ScalableSurfaceView;
 import org.dobots.utilities.Utils;
+
+import robots.gui.VideoSurfaceView;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -15,7 +20,10 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class VideoHelper implements IVideoListener, IFpsListener {
+public class VideoHelper implements IVideoListener, IFpsListener, IRawVideoListener {
+	
+	private static final int TIMEOUT = 5000; // 5 seconds
+	private static final int WATCHDOG_INTERVAL = 1000; // 1 second
 	
 	private Handler mHandler = new Handler();
 
@@ -23,24 +31,43 @@ public class VideoHelper implements IVideoListener, IFpsListener {
 
 	private boolean m_bVideoStopped;
 
-	private ScalableImageView m_ivVideo;
+	private VideoSurfaceView m_ivVideo;
 	private ProgressBar m_pbLoading;
 	private TextView m_lblFps;
 	private FrameLayout m_layCamera;
 
 	private Activity m_oActivity;
+	
+	private long lastFrameRecv = 0;
 
 	public VideoHelper(Activity activity, ViewGroup container) {
 		m_oActivity = activity;
 		
     	LayoutInflater.from(activity).inflate(R.layout.videoview, container);
     	m_layCamera = (FrameLayout) container.findViewById(R.id.layCamera);
-    	m_ivVideo = (ScalableImageView) container.findViewById(R.id.ivCamera);
+    	m_ivVideo = (VideoSurfaceView) container.findViewById(R.id.ivCamera);
     	m_pbLoading = (ProgressBar) container.findViewById(R.id.pbLoading);
     	m_lblFps = (TextView) container.findViewById(R.id.lblFPS);
     	
+    	m_ivVideo.setScale(true);
+    	
     	initialize();
+    	
+    	mHandler.postDelayed(m_oWatchdog, WATCHDOG_INTERVAL);
 	}
+	
+	protected Runnable m_oWatchdog = new Runnable() {
+		
+		public void run() {
+			if (m_bVideoConnected && !m_bVideoStopped) {
+				if (System.currentTimeMillis() - lastFrameRecv > TIMEOUT) {
+					m_bVideoConnected = false;
+					showVideoLoading(true);
+				}
+			}
+			mHandler.postDelayed(this, WATCHDOG_INTERVAL);
+		}
+	};
 
 	protected Runnable m_oTimeoutRunnable = new Runnable() {
 		@Override
@@ -64,13 +91,19 @@ public class VideoHelper implements IVideoListener, IFpsListener {
 	}
 
 	public void onStartVideo() {
+		onStartVideo(true);
+	}
+	
+	public void onStartVideo(boolean i_bTimeout) {
 		m_bVideoConnected = false;
 		m_bVideoStopped = false;
 		showVideoLoading(true);
-		mHandler.postDelayed(m_oTimeoutRunnable, 15000);
+		if (i_bTimeout) {
+			mHandler.postDelayed(m_oTimeoutRunnable, 15000);
+		}
 	}
 
-	protected void onStopVideo() {
+	public void onStopVideo() {
 		m_bVideoStopped = true;
 		showVideoMsg("Video OFF");
 	}
@@ -94,9 +127,7 @@ public class VideoHelper implements IVideoListener, IFpsListener {
 			height = 240;
 		}
 		
-		Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-		Utils.writeToCanvas(m_oActivity, new Canvas(bmp), i_strMsg, true);
-		m_ivVideo.setImageBitmap(bmp);
+		Utils.writeToSurfaceView(m_oActivity, m_ivVideo, i_strMsg, true);
 	}
 
 	@Override
@@ -110,6 +141,7 @@ public class VideoHelper implements IVideoListener, IFpsListener {
 				}
 			}
 		});
+		
 	}
 
 	@Override
@@ -120,8 +152,30 @@ public class VideoHelper implements IVideoListener, IFpsListener {
 				m_bVideoConnected = true;
 				showVideoLoading(false);
 			}
+			
+			lastFrameRecv = System.currentTimeMillis();
+			m_ivVideo.onFrame(bmp, 0);
+		}
+	}
 
-			m_ivVideo.setImageBitmap(bmp);
+	@Override
+	public void onFrame(byte[] rgb, int rotation) {
+		if (!m_bVideoStopped) {
+			Utils.runAsyncUiTask(new Runnable() {
+				
+				@Override
+				public void run() {
+					if (!m_bVideoConnected) {
+						mHandler.removeCallbacks(m_oTimeoutRunnable);
+						m_bVideoConnected = true;
+						showVideoLoading(false);
+					}
+				}
+			});
+
+			lastFrameRecv = System.currentTimeMillis();
+			m_ivVideo.onFrame(rgb, rotation);
+
 		}
 	}
     
