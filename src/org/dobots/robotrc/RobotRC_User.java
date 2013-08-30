@@ -1,21 +1,36 @@
+/**
+* 456789------------------------------------------------------------------------------------------------------------120
+*
+* @brief: Activity for the User (Remote Control) part of the Robot RC application
+* @file: RobotRC_User.java
+*
+* @desc:  	Offers remote control for Robots over ZeroMQ. The robot can be controlled with
+* 			either arrow buttons or joystick. At the same time the received video will be
+* 			displayed on the screen. Works both in landscape and portray mode.
+*
+*
+* Copyright (c) 2013 Dominik Egger <dominik@dobots.nl>
+*
+* @author:		Dominik Egger
+* @date:		30.08.2013
+* @project:		RobotRC
+* @company:		Distributed Organisms B.V.
+*/
 package org.dobots.robotrc;
 
 import org.dobots.communication.control.ZmqRemoteControlHelper;
 import org.dobots.communication.control.ZmqRemoteListener;
-import org.dobots.communication.video.IFpsListener;
-import org.dobots.communication.video.IVideoListener;
 import org.dobots.communication.video.VideoDisplayThread;
+import org.dobots.communication.video.VideoHelper;
 import org.dobots.communication.zmq.ZmqActivity;
 import org.dobots.communication.zmq.ZmqConnectionHelper;
-import org.dobots.communication.zmq.ZmqHandler;
 import org.dobots.communication.zmq.ZmqConnectionHelper.UseCase;
+import org.dobots.communication.zmq.ZmqHandler;
 import org.dobots.utilities.ScalableImageView;
 import org.zeromq.ZMQ;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -77,6 +92,7 @@ public class RobotRC_User extends ZmqActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		mZmqConnectionHelper.close();
+		mVideoHelper.onDestroy();
 	}
 	
 	@Override

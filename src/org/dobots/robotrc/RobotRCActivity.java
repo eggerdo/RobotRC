@@ -1,37 +1,37 @@
+/**
+* 456789------------------------------------------------------------------------------------------------------------120
+*
+* @brief: Robot RC application
+* @file: RobotRCActivity.java
+*
+* @desc:  	Main Activity for the Robot RC application. choose between robot and user mode.
+*
+*
+* Copyright (c) 2013 Dominik Egger <dominik@dobots.nl>
+*
+* @author:		Dominik Egger
+* @date:		30.08.2013
+* @project:		RobotRC
+* @company:		Distributed Organisms B.V.
+*/
 package org.dobots.robotrc;
 
 
-import org.dobots.communication.zmq.ZmqActivity;
 import org.dobots.communication.zmq.ZmqHandler;
-import org.dobots.communication.zmq.ZmqMessageHandler;
-import org.dobots.communication.zmq.ZmqMessageHandler.ZmqMessageListener;
 import org.dobots.communication.zmq.ZmqSettings;
-import org.dobots.communication.zmq.ZmqSettings.SettingsChangeListener;
+import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.Utils;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMsg;
 
-import robots.RobotType;
-import robots.ctrl.IRobotDevice;
-import robots.ctrl.RobotDeviceFactory;
-import robots.gui.RobotInventory;
-import robots.gui.RobotLaunchHelper;
-import robots.gui.RobotViewFactory;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
-public class RobotRCActivity extends Activity {
+public class RobotRCActivity extends BaseActivity {
 
 	private static final String TAG = "RoboTalk";
 
@@ -42,11 +42,6 @@ public class RobotRCActivity extends Activity {
 	private ZmqHandler m_oZmqHandler;
 	private ZmqSettings m_oSettings;
 	
-//	private String m_strCommandSendAddress;
-//	private String m_strCommandReceiveAddress;
-//	private String m_strVideoSendAddress;
-//	private String m_strVideoRecvAddress;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,23 +54,10 @@ public class RobotRCActivity extends Activity {
         
         m_oZmqHandler = new ZmqHandler(this);
         m_oSettings = m_oZmqHandler.getSettings();
-
-//        Bundle extras = getIntent().getExtras();
-//        if (extras != null) {
-//        	getConnectionFromBundle(extras);
-//        	setupConnections(m_bRemote);
-//        } else if (!m_oSettings.isValid()) {
-//        	setupConnections(m_oSettings.isRemote());
-//        	RobotLaunchHelper.showRobot(CONTEXT, RobotType.RBT_ROVER2);
-//		}
         
         if (!m_oSettings.checkSettings()) {
         	m_oSettings.showDialog(this);
         }
-        
-
-//		Intent intent = new Intent(RobotRCActivity.this, RobotRC_User.class);
-//		startActivity(intent);
     }
     
     @Override

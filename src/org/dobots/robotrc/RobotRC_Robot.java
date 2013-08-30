@@ -1,3 +1,21 @@
+/**
+* 456789------------------------------------------------------------------------------------------------------------120
+*
+* @brief: Activity for the Robot part of the Robot RC application
+* @file: RobotRC_Robot.java
+*
+* @desc:  	Offers a set of available robots to choose from. The application will connect to the robot
+* 			then stream the video over ZeroMQ. In return it listens for incoming commands over ZeroMQ
+* 			and forwards them to the robot
+*
+*
+* Copyright (c) 2013 Dominik Egger <dominik@dobots.nl>
+*
+* @author:		Dominik Egger
+* @date:		30.08.2013
+* @project:		RobotRC
+* @company:		Distributed Organisms B.V.
+*/
 package org.dobots.robotrc;
 
 import org.dobots.communication.zmq.ZmqActivity;
