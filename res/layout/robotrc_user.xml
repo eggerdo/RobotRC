@@ -1,49 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    
-    <LinearLayout 
-        android:id="@+id/layVideoContainer"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+   	android:layout_height="match_parent"
+  	android:orientation="vertical" >
+  	   
+   	<LinearLayout 
+	    android:id="@+id/layVideo"
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-    	android:orientation="vertical" >
-           
-	    <LinearLayout 
-	        android:id="@+id/layVideo"
-		    android:layout_width="match_parent"
-		    android:layout_height="0dp"
-		    android:layout_weight="1"
-	    	android:orientation="vertical" />
-           
-	    <LinearLayout 
-	        android:id="@+id/layVideoSpacer"
-		    android:layout_width="match_parent"
-		    android:layout_height="0dp"
-		    android:layout_weight="1"
-	    	android:orientation="vertical" />
-                
-    </LinearLayout>
-     
-    <LinearLayout
+	    android:layout_height="0dp"
+	    android:layout_weight="1"
+	   	android:orientation="vertical" />
+       
+   	<LinearLayout 
+	    android:id="@+id/layControl"
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-    	android:orientation="vertical" >
-    	
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-        
+	    android:layout_height="0dp"
+	    android:layout_weight="1"
+	   	android:orientation="horizontal" >
+           
+   	    <include 
+   	        android:layout_width="wrap_content"
+		    android:layout_height="match_parent"
+		    android:visibility="gone"
+   	        layout="@layout/camera_control"/>
+   	    
 		<include
-		    android:layout_width="match_parent"
-		    android:layout_height="0dp"
+		    android:layout_width="0dp"
 		    android:layout_weight="1"
+		    android:layout_height="match_parent"
 		    layout="@layout/remote_control" />
-        
-    </LinearLayout>
-    
-
-</FrameLayout>
+		
+	</LinearLayout>
+      
+</LinearLayout>
    

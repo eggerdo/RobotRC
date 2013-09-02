@@ -1,48 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/txtIntro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/intro"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/btnRobot"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:background="@android:drawable/btn_default"
+            android:padding="30dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/robot" />
+
+        <ImageButton
+            android:id="@+id/btnUser"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:background="@android:drawable/btn_default"
+            android:scaleType="centerInside"
+            android:src="@drawable/rc" />
+        
+    </LinearLayout>
+
     <View
         android:layout_width="wrap_content"
-        android:layout_height="10dp" />
-    
-    <LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="horizontal" >
-    
-	    <ImageButton
-	        android:id="@+id/btnRobot"
-	        android:layout_width="0dp"
-	        android:layout_height="match_parent"
-	        android:layout_gravity="center_horizontal"
-	        android:layout_weight="1"
-	        android:background="@android:drawable/btn_default"
-	        android:padding="30dp"
-	        android:scaleType="centerInside"
-	        android:src="@drawable/robot" />
-	
-	    <ImageButton
-	        android:id="@+id/btnUser"
-	        android:layout_width="0dp"
-	        android:layout_height="match_parent"
-	        android:layout_gravity="center_horizontal"
-	        android:layout_weight="1"
-	        android:background="@android:drawable/btn_default"
-	        android:scaleType="centerInside"
-	        android:src="@drawable/rc" />
-    
-    </LinearLayout>
-	    
-</LinearLayout>
+        android:layout_height="20dp" />
 
+    <TextView
+        android:id="@+id/lblChangeLog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/change_log"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</LinearLayout>

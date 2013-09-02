@@ -3,14 +3,22 @@
 
     <string name="app_name">Robot RC</string>
     
-    <string name="intro">This app provides two usecases. 
-        1) ZMQ remote control features for robots. It connects to the robot and listens to incoming remote control commands over ZMQ. In return, the video stream received from the robot is sent over ZMQ. To be used with the robot server (https://github.com/eggerdo/robot_server.node). 
-        2) User interface to remote control a robot over ZMQ. Controls are sent over ZMQ to the robot server and video stream is received and displayed</string>
-
+    <string name="intro">The Robot RC app provides two components:</string>
+    <string-array name="usecases">
+        <item>- ØMQ remote control features for robots. It connects to the robot and listens to incoming remote control commands over ØMQ. In return, the video stream received from the robot is sent over ØMQ. (To be used with the robot server found at https://github.com/eggerdo/robot_server.node).</item>
+        <item>- User interface to remote control a robot over ØMQ. Controls are sent over ØMQ to the robot server and the video stream is received and displayed on the screen.</item>
+    </string-array>
+         
     <string name="robotrc_robot_desc">Chose one of the following robots to connect. Select \'remember choice\'
         if you want to connect automatically to this robot next time</string>
 
     <string name="autoconnect">remember choice</string>
     
+    <string name="change_log">Change Log:</string>     
+    <string-array name="changelog">
+        <item>- Initial release with Robots: Romo, AC13, Rover 2.0, I-Spy Tank</item>
+        <item>- Remote Control over ØMQ</item>
+        <item>- Video Playback over ØMQ</item>
+	</string-array>
     
 </resources>

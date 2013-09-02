@@ -19,7 +19,7 @@
 package org.dobots.robotrc;
 
 import org.dobots.communication.control.ZmqRemoteControlHelper;
-import org.dobots.communication.control.ZmqRemoteListener;
+import org.dobots.communication.control.ZmqRemoteControlSender;
 import org.dobots.communication.video.VideoDisplayThread;
 import org.dobots.communication.video.VideoHelper;
 import org.dobots.communication.zmq.ZmqActivity;
@@ -27,19 +27,30 @@ import org.dobots.communication.zmq.ZmqConnectionHelper;
 import org.dobots.communication.zmq.ZmqConnectionHelper.UseCase;
 import org.dobots.communication.zmq.ZmqHandler;
 import org.dobots.utilities.ScalableImageView;
+import org.dobots.utilities.Utils;
+import org.dobots.utilities.VerticalSeekBar;
 import org.zeromq.ZMQ;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class RobotRC_User extends ZmqActivity {
+	
+	private static final int MENU_CAMERA_CONTROL = 1;
 
 	// video
 	private ScalableImageView m_svVideo;
 	private TextView lblFPS;
-	private ZmqRemoteListener m_oZmqRemoteListener;
+	private ZmqRemoteControlSender m_oZmqRemoteListener;
 	private ZmqRemoteControlHelper m_oRemoteCtrl;
 	private ZmqConnectionHelper mZmqConnectionHelper;
 	
@@ -50,6 +61,13 @@ public class RobotRC_User extends ZmqActivity {
 	private LinearLayout m_layVideo;
 	
 	private VideoHelper mVideoHelper;
+
+	private LinearLayout m_layCamera;
+
+	private VerticalSeekBar m_sbCamera;
+
+	private Button m_btnToggle;
+	private boolean m_bCameraControl = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +79,16 @@ public class RobotRC_User extends ZmqActivity {
 		mZmqConnectionHelper.setup(mZmqHandler, this);
 
 		// don't know the robot id yet
-    	m_oZmqRemoteListener = new ZmqRemoteListener("");
-		m_oRemoteCtrl = new ZmqRemoteControlHelper(this, m_oZmqRemoteListener);
+    	m_oZmqRemoteListener = new ZmqRemoteControlSender("");
+		m_oRemoteCtrl = new ZmqRemoteControlHelper(this);
+		m_oRemoteCtrl.setDriveControlListener(m_oZmqRemoteListener);
+		m_oRemoteCtrl.setCameraControlListener(m_oZmqRemoteListener);
 
 		setupVideoDisplay();
 		
 		if (savedInstanceState != null) {
-			m_oRemoteCtrl.setJoystickControl(savedInstanceState.getBoolean("joystick"));
+			m_oRemoteCtrl.setJoystickControl(savedInstanceState.getBoolean("joystickCtrl"));
+			m_bCameraControl = savedInstanceState.getBoolean("cameraCtrl");
 		}
 		
 	}
@@ -78,12 +99,51 @@ public class RobotRC_User extends ZmqActivity {
 		getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		m_layVideo = (LinearLayout) findViewById(R.id.layVideo);
+		
+		m_layCamera = (LinearLayout) findViewById(R.id.layCameraControl);
+		
+		m_sbCamera = (VerticalSeekBar) findViewById(R.id.sbCamera);
+		m_sbCamera.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar paramSeekBar) {
+				m_sbCamera.setNewProgress(50);
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar paramSeekBar) {
+				m_sbCamera.getProgress();
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				if (progress < 50) {
+					m_oRemoteCtrl.cameraDown();
+				} else if (progress > 50) {
+					m_oRemoteCtrl.cameraUp();
+				} else {
+					m_oRemoteCtrl.cameraStop();
+				}
+			}
+		});
+		
+		m_btnToggle = (Button) findViewById(R.id.btnToggle);
+		m_btnToggle.getBackground().setAlpha(99);
+		m_btnToggle.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View paramView) {
+				m_oRemoteCtrl.toggleCamera();
+			}
+		});
 
 	}
 	
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putBoolean("joystick", m_oRemoteCtrl.isJoystickControl());
+		outState.putBoolean("joystickCtrl", m_oRemoteCtrl.isJoystickControl());
+		outState.putBoolean("cameraCtrl", m_bCameraControl);
 
 		super.onSaveInstanceState(outState);
 	}
@@ -139,6 +199,7 @@ public class RobotRC_User extends ZmqActivity {
 	}
     
     ZMQ.Socket oVideoRecvSocket;
+
     private void startVideo() {
 
 		oVideoRecvSocket = ZmqHandler.getInstance().obtainVideoRecvSocket();
@@ -167,4 +228,36 @@ public class RobotRC_User extends ZmqActivity {
 		oVideoRecvSocket = null;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	super.onCreateOptionsMenu(menu);
+    	
+    	menu.add(Menu.NONE, MENU_CAMERA_CONTROL, MENU_CAMERA_CONTROL, "Camera Control");
+    	
+    	return true;
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+    	Utils.updateOnOffMenuItem(menu.findItem(MENU_CAMERA_CONTROL), m_bCameraControl);
+    	
+    	return super.onPrepareOptionsMenu(menu);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch(item.getItemId()) {
+    	case MENU_CAMERA_CONTROL:
+    		showCameraControl(!m_bCameraControl);
+    		return true;
+    	}
+    	
+    	return super.onOptionsItemSelected(item);
+    }
+
+	private void showCameraControl(boolean show) {
+		m_bCameraControl = show;
+		Utils.showView(m_layCamera, m_bCameraControl);
+	}
+    
 }

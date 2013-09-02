@@ -20,16 +20,21 @@ package org.dobots.robotrc;
 import org.dobots.communication.zmq.ZmqHandler;
 import org.dobots.communication.zmq.ZmqSettings;
 import org.dobots.utilities.BaseActivity;
+import org.dobots.utilities.RTFUtils;
 import org.dobots.utilities.Utils;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.TextView.BufferType;
 
 public class RobotRCActivity extends BaseActivity {
 
@@ -58,6 +63,9 @@ public class RobotRCActivity extends BaseActivity {
         if (!m_oSettings.checkSettings()) {
         	m_oSettings.showDialog(this);
         }
+        
+        fillText();
+        writeChangeLog();
     }
     
     @Override
@@ -65,14 +73,6 @@ public class RobotRCActivity extends BaseActivity {
     	super.onDestroy();
     	m_oZmqHandler.onDestroy();
     }
-    
-//    private void getConnectionFromBundle(Bundle i_oBundle) {
-//    	m_strCommandReceiveAddress = i_oBundle.getString("command_recv_address");
-//    	m_strCommandSendAddress = i_oBundle.getString("command_send_address");
-//    	m_strVideoRecvAddress = i_oBundle.getString("video_recv_address");
-//    	m_strVideoSendAddress = i_oBundle.getString("video_send_address");
-//    	m_bRemote = i_oBundle.getBoolean("remote");
-//    }
 
     private void setProperties() {
         setContentView(R.layout.main);
@@ -104,24 +104,50 @@ public class RobotRCActivity extends BaseActivity {
 		return CONTEXT;
 	}
 	
-	@Override
-	protected void onRestart() {
-		// TODO Auto-generated method stub
-		super.onRestart();
-		
-		// special handling, if the main activity get's restarted we are actually supposed to close the app
-		// because we navigated back from the robot
-//		finish();
-	}
+//	@Override
+//    public Dialog onCreateDialog(int id) {
+//    	return m_oZmqHandler.getSettings().onCreateDialog(this, id);
+//    }
+//    
+//	@Override
+//	protected void onPrepareDialog(int id, Dialog dialog) {
+//		m_oZmqHandler.getSettings().onPrepareDialog(id, dialog);
+//	}
 
-	@Override
-    public Dialog onCreateDialog(int id) {
-    	return m_oZmqHandler.getSettings().onCreateDialog(this, id);
-    }
-    
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog) {
-		m_oZmqHandler.getSettings().onPrepareDialog(id, dialog);
+	private void fillText() {
+		String[] rgUsecases = getResources().getStringArray(R.array.usecases);
+		
+		SpannableString title = new SpannableString(getResources().getString(R.string.intro) + "\n\n");
+		title.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(), 0);
+		CharSequence text = title;
+		
+		text = RTFUtils.recursive(text, rgUsecases);
+		
+		TextView intro = (TextView) findViewById(R.id.txtIntro);
+		intro.setText(text, BufferType.SPANNABLE);
+	}
+	
+	private void writeChangeLog() {
+		String strVersion;
+		try {
+			strVersion = "Version " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			strVersion = "?";
+		}
+		String[] rgstrChangelog = getResources().getStringArray(R.array.changelog);
+		
+		// write title together with the version and increase the text size slightly
+		SpannableString title = new SpannableString("Changelog " + strVersion + "\n\n");
+		title.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(), 0);
+		CharSequence text = title;
+	
+		// assemble the rest of the changelog
+		text = RTFUtils.recursive(text, rgstrChangelog);
+
+		// write everything into the textview
+        TextView changelog = (TextView) findViewById(R.id.lblChangeLog);
+        changelog.setText(text, BufferType.SPANNABLE);
 	}
 
 }
