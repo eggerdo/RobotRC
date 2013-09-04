@@ -64,6 +64,12 @@ public class RobotRC_Robot extends ZmqActivity {
         
 	}
 	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		m_oZmqCoordinator.close();
+	}
+	
 	private void setProperties() {
 		setContentView(R.layout.robotrc_robot);
 		
