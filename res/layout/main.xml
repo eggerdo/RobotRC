@@ -24,8 +24,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
             android:background="@android:drawable/btn_default"
-            android:padding="30dp"
-            android:scaleType="centerInside"
+            android:paddingBottom="20dp"
+            android:paddingTop="10dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/robot" />
 
         <ImageButton
@@ -35,7 +36,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
             android:background="@android:drawable/btn_default"
-            android:scaleType="centerInside"
+            android:scaleType="fitCenter"
             android:src="@drawable/rc" />
         
     </LinearLayout>
