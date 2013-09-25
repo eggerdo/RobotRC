@@ -43,7 +43,7 @@ public class RobotRC_Robot extends ZmqActivity {
 	public static final boolean DEF_AUTO_CONNECT	= false;
 	public static final RobotType DEF_ROBOT_TYPE	= null;
 	
-	private ZmqConnectionHelper m_oZmqCoordinator;
+	private ZmqConnectionHelper m_oZmqHelper;
 	
 	private RobotType[] mRobotList = {RobotType.RBT_ROMO, RobotType.RBT_AC13ROVER, RobotType.RBT_ROVER2, RobotType.RBT_SPYTANK};
 	private boolean mAutoConnect;
@@ -58,16 +58,12 @@ public class RobotRC_Robot extends ZmqActivity {
 
         setProperties();
         enable(false);
-
-        m_oZmqCoordinator = new ZmqConnectionHelper(UseCase.ROBOT);
-        m_oZmqCoordinator.setup(mZmqHandler, this);
-        
 	}
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		m_oZmqCoordinator.close();
+		m_oZmqHelper.close();
 	}
 	
 	private void setProperties() {
@@ -125,9 +121,12 @@ public class RobotRC_Robot extends ZmqActivity {
 		m_cbxAutoConnect.setEnabled(enable);
 		m_lvRobotList.setEnabled(enable);
 	}
-	
+
 	@Override
-	public void ready() {
+	public void onZmqReady() {
+        m_oZmqHelper = new ZmqConnectionHelper(UseCase.ROBOT);
+        m_oZmqHelper.setup(mZmqHandler, this);
+        
 		enable(true);
 
         if (checkAutoConnectSettings()) {
@@ -136,9 +135,9 @@ public class RobotRC_Robot extends ZmqActivity {
 	}
 
 	@Override
-	public void failed() {
+	public void onZmqFailed() {
 		enable(false);
-		Utils.showToast("ZMQ failed, check settings!!", Toast.LENGTH_LONG);
+		showToast("Failed to set-up ZeroMQ, make sure your settings are correct!", Toast.LENGTH_LONG);
 	}
 
 }

@@ -17,6 +17,7 @@
 package org.dobots.robotrc;
 
 
+import org.dobots.communication.zmq.ZmqActivity;
 import org.dobots.communication.zmq.ZmqHandler;
 import org.dobots.communication.zmq.ZmqSettings;
 import org.dobots.utilities.BaseActivity;
@@ -34,9 +35,10 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.TextView.BufferType;
 
-public class RobotRCActivity extends BaseActivity {
+public class RobotRCActivity extends ZmqActivity {
 
 	private static final String TAG = "RoboTalk";
 
@@ -44,9 +46,6 @@ public class RobotRCActivity extends BaseActivity {
 
 	// general
 
-	private ZmqHandler m_oZmqHandler;
-	private ZmqSettings m_oSettings;
-	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,13 +56,6 @@ public class RobotRCActivity extends BaseActivity {
         CONTEXT = this;
         Utils.setContext(CONTEXT);
         
-        m_oZmqHandler = new ZmqHandler(this);
-        m_oSettings = m_oZmqHandler.getSettings();
-        
-        if (!m_oSettings.checkSettings()) {
-        	m_oSettings.showDialog(this);
-        }
-        
         fillText();
         writeChangeLog();
     }
@@ -71,7 +63,7 @@ public class RobotRCActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
     	super.onDestroy();
-    	m_oZmqHandler.onDestroy();
+    	mZmqHandler.onDestroy();
     }
 
     private void setProperties() {
@@ -148,6 +140,16 @@ public class RobotRCActivity extends BaseActivity {
 		// write everything into the textview
         TextView changelog = (TextView) findViewById(R.id.lblChangeLog);
         changelog.setText(text, BufferType.SPANNABLE);
+	}
+
+	@Override
+	public void onZmqReady() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onZmqFailed() {
+		showToast("Failed to set-up ZeroMQ, make sure your settings are correct!", Toast.LENGTH_LONG);
 	}
 
 }

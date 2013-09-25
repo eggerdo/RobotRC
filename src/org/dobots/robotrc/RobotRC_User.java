@@ -40,6 +40,7 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
@@ -48,16 +49,12 @@ public class RobotRC_User extends ZmqActivity {
 	private static final int MENU_CAMERA_CONTROL = 1;
 
 	// video
-	private ScalableImageView m_svVideo;
-	private TextView lblFPS;
 	private ZmqRemoteControlSender m_oZmqRemoteListener;
 	private ZmqRemoteControlHelper m_oRemoteCtrl;
 	private ZmqConnectionHelper mZmqConnectionHelper;
 	
 	private String mRobotID = "";
 	private VideoDisplayThread m_oVideoDisplayer;
-	private boolean m_bVideoStopped;
-	private boolean m_bVideoConnected;
 	private LinearLayout m_layVideo;
 	
 	private VideoHelper mVideoHelper;
@@ -69,28 +66,20 @@ public class RobotRC_User extends ZmqActivity {
 	private Button m_btnToggle;
 	private boolean m_bCameraControl = false;
 	
+	private ZMQ.Socket m_oVideoRecvSocket;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
         setProperties();
         
-		mZmqConnectionHelper = new ZmqConnectionHelper(UseCase.USER);
-		mZmqConnectionHelper.setup(mZmqHandler, this);
-
-		// don't know the robot id yet
-    	m_oZmqRemoteListener = new ZmqRemoteControlSender("");
 		m_oRemoteCtrl = new ZmqRemoteControlHelper(this);
-		m_oRemoteCtrl.setDriveControlListener(m_oZmqRemoteListener);
-		m_oRemoteCtrl.setCameraControlListener(m_oZmqRemoteListener);
-
-		setupVideoDisplay();
 		
 		if (savedInstanceState != null) {
 			m_oRemoteCtrl.setJoystickControl(savedInstanceState.getBoolean("joystickCtrl"));
 			m_bCameraControl = savedInstanceState.getBoolean("cameraCtrl");
 		}
-		
 	}
 	
 	private void setProperties() {
@@ -179,39 +168,27 @@ public class RobotRC_User extends ZmqActivity {
 		startVideo();
 	}
 
-	@Override
-	public void ready() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void failed() {
-		// TODO Auto-generated method stub
-
-	}
-
     private void setupVideoDisplay() {
 
         mVideoHelper = new VideoHelper(this, m_layVideo);
         
-//        startVideo();
+        startVideo();
 	}
     
-    ZMQ.Socket oVideoRecvSocket;
-
     private void startVideo() {
+    	if (mVideoHelper != null) {
 
-		oVideoRecvSocket = ZmqHandler.getInstance().obtainVideoRecvSocket();
-		oVideoRecvSocket.subscribe(mRobotID.getBytes());
-		
-		// start a video display thread which receives video frames from the socket and displays them
-		m_oVideoDisplayer = new VideoDisplayThread(ZmqHandler.getInstance().getContext().getContext(), oVideoRecvSocket);
-		m_oVideoDisplayer.setRawVideoListner(mVideoHelper);
-		m_oVideoDisplayer.setFPSListener(mVideoHelper);
-		m_oVideoDisplayer.start();
-		
-		mVideoHelper.onStartVideo(false);
+			m_oVideoRecvSocket = ZmqHandler.getInstance().obtainVideoRecvSocket();
+			m_oVideoRecvSocket.subscribe(mRobotID.getBytes());
+			
+			// start a video display thread which receives video frames from the socket and displays them
+			m_oVideoDisplayer = new VideoDisplayThread(ZmqHandler.getInstance().getContext().getContext(), m_oVideoRecvSocket);
+			m_oVideoDisplayer.setRawVideoListner(mVideoHelper);
+			m_oVideoDisplayer.setFPSListener(mVideoHelper);
+			m_oVideoDisplayer.start();
+			
+			mVideoHelper.onStartVideo(false);
+    	}
     }
     
     private void stopVideo() {
@@ -224,8 +201,8 @@ public class RobotRC_User extends ZmqActivity {
 
     	mVideoHelper.onStopVideo();
     	
-		oVideoRecvSocket.close();
-		oVideoRecvSocket = null;
+		m_oVideoRecvSocket.close();
+		m_oVideoRecvSocket = null;
     }
 
     @Override
@@ -258,6 +235,24 @@ public class RobotRC_User extends ZmqActivity {
 	private void showCameraControl(boolean show) {
 		m_bCameraControl = show;
 		Utils.showView(m_layCamera, m_bCameraControl);
+	}
+
+	@Override
+	public void onZmqReady() {
+		mZmqConnectionHelper = new ZmqConnectionHelper(UseCase.USER);
+		mZmqConnectionHelper.setup(mZmqHandler, this);
+
+		// don't know the robot id yet
+    	m_oZmqRemoteListener = new ZmqRemoteControlSender("");
+		m_oRemoteCtrl.setDriveControlListener(m_oZmqRemoteListener);
+		m_oRemoteCtrl.setCameraControlListener(m_oZmqRemoteListener);
+
+		setupVideoDisplay();
+	}
+
+	@Override
+	public void onZmqFailed() {
+		showToast("Failed to set-up ZeroMQ, make sure your settings are correct!", Toast.LENGTH_LONG);
 	}
     
 }
