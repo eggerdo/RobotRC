@@ -16,9 +16,7 @@
     
     <string name="change_log">Change Log:</string>     
     <string-array name="changelog">
-        <item>- Initial release with Robots: Romo, AC13, Rover 2.0, I-Spy Tank</item>
-        <item>- Remote Control over ØMQ</item>
-        <item>- Video Playback over ØMQ</item>
+        <item>- Home-made Dotty robot added for demonstration purposes</item>
 	</string-array>
     
 </resources>

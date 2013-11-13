@@ -21,7 +21,6 @@ package org.dobots.robotrc;
 import org.dobots.communication.zmq.ZmqActivity;
 import org.dobots.communication.zmq.ZmqConnectionHelper;
 import org.dobots.communication.zmq.ZmqConnectionHelper.UseCase;
-import org.dobots.utilities.Utils;
 
 import robots.RobotType;
 import robots.gui.RobotLaunchHelper;
@@ -45,7 +44,8 @@ public class RobotRC_Robot extends ZmqActivity {
 	
 	private ZmqConnectionHelper m_oZmqHelper;
 	
-	private RobotType[] mRobotList = {RobotType.RBT_ROMO, RobotType.RBT_AC13ROVER, RobotType.RBT_ROVER2, RobotType.RBT_SPYTANK};
+	private RobotType[] mRobotList = {RobotType.RBT_ROMO, RobotType.RBT_AC13ROVER, RobotType.RBT_ROVER2, RobotType.RBT_SPYTANK,
+									  RobotType.RBT_PIRATEDOTTY};
 	private boolean mAutoConnect;
 	private RobotType mSelectedRobot;
 	
@@ -63,7 +63,10 @@ public class RobotRC_Robot extends ZmqActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		m_oZmqHelper.close();
+		
+		if (m_oZmqHelper != null) {
+			m_oZmqHelper.close();
+		}
 	}
 	
 	private void setProperties() {
@@ -124,6 +127,10 @@ public class RobotRC_Robot extends ZmqActivity {
 
 	@Override
 	public void onZmqReady() {
+		if (m_oZmqHelper != null) {
+			m_oZmqHelper.close();
+		}
+		
         m_oZmqHelper = new ZmqConnectionHelper(UseCase.ROBOT);
         m_oZmqHelper.setup(mZmqHandler, this);
         

@@ -26,11 +26,11 @@ import org.dobots.communication.zmq.ZmqActivity;
 import org.dobots.communication.zmq.ZmqConnectionHelper;
 import org.dobots.communication.zmq.ZmqConnectionHelper.UseCase;
 import org.dobots.communication.zmq.ZmqHandler;
-import org.dobots.utilities.ScalableImageView;
 import org.dobots.utilities.Utils;
 import org.dobots.utilities.VerticalSeekBar;
 import org.zeromq.ZMQ;
 
+import robots.ctrl.RemoteControlHelper;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,9 +40,8 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.TextView;
+import android.widget.Toast;
 
 public class RobotRC_User extends ZmqActivity {
 	
@@ -140,8 +139,14 @@ public class RobotRC_User extends ZmqActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mZmqConnectionHelper.close();
-		mVideoHelper.onDestroy();
+		
+		if (mZmqConnectionHelper != null) {
+			mZmqConnectionHelper.close();
+		}
+		
+		if (mVideoHelper != null) {
+			mVideoHelper.onDestroy();
+		}
 	}
 	
 	@Override
@@ -199,10 +204,16 @@ public class RobotRC_User extends ZmqActivity {
 			m_oVideoDisplayer = null;
 		}
 
-    	mVideoHelper.onStopVideo();
+		if (mVideoHelper != null) {
+			mVideoHelper.onStopVideo();
+			mVideoHelper = null;
+		}
     	
-		m_oVideoRecvSocket.close();
-		m_oVideoRecvSocket = null;
+		if (m_oVideoRecvSocket != null) {
+			m_oVideoRecvSocket.close();
+			m_oVideoRecvSocket = null;
+		}
+		
     }
 
     @Override
