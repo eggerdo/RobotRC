@@ -22,7 +22,7 @@ First install / start-up the Robot RC app. On the first start, the app will show
 
 ### P2P
 
-On the first devices which will connect to the robot, enter the IP address of the device itself and select Local. For the message ports, choose a set of numbers, e.g. 4000 (Video), 4010 (Command) and 4020 (Event).
+On the first devices which will connect to the robot, enter the IP address of the device itself and select Local. For the message ports, choose a set of numbers, e.g. 4000 (Video), 4010 (Command).
 
 On the second device, enter the same port numbers, the IP address of the first device and select Remote.
 
@@ -32,7 +32,7 @@ Note that the devices have to be connected to the same network!
 
 First set up the robot server, which has to run on a computer with access to the robot's network. I.e. either connect the robot to your network, or if not possible connect the computer directly to the robot's network. Follow the steps described [here](https://github.com/eggerdo/robot_server.node) to install and run the robot server.
     
-For the ØMQ configuration, select Remote on both devices, enter the IP address of the computer running the robot server, and the message ports which by default are 4000 (Video), 4010 (Command) and 4020 (Event).
+For the ØMQ configuration, select Remote on both devices, enter the IP address of the computer running the robot server, and the message ports which by default are 4000 (Video), 4010 (Command).
 
 ## Run
 
@@ -43,3 +43,7 @@ On the second device choose the right button. This will show the remote control 
 ## Addendum
 
 In case you're wondering why we need the second device to control the robot since we can already do that with the first, consider this: If the robot server has access to the internet, and is visible to the outside (ports open, static ip, etc.) then your second device can be anywhere in the world with internet access and still be able to control the robot remotely.
+
+# Project Dependencies
+
+To compile the app from source, the two android library projects [DoBotsUtilities](https://github.com/eggerdo/DoBotsUtilities) and [Robot-Lib](https://github.com/eggerdo/Robot-Lib) are required as well. Import them alongside the RobotRC project, then make sure that the references in the RobotRC's project properties (Project > Properties > Android) are correct.
