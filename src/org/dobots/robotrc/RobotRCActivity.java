@@ -17,12 +17,10 @@
 package org.dobots.robotrc;
 
 
-import org.dobots.communication.zmq.ZmqActivity;
-import org.dobots.communication.zmq.ZmqHandler;
-import org.dobots.communication.zmq.ZmqSettings;
-import org.dobots.utilities.BaseActivity;
 import org.dobots.utilities.RTFUtils;
 import org.dobots.utilities.Utils;
+import org.dobots.zmq.ZmqActivity;
+import org.dobots.zmq.ZmqHandler;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -35,8 +33,8 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.BufferType;
+import android.widget.Toast;
 
 public class RobotRCActivity extends ZmqActivity {
 
@@ -63,7 +61,7 @@ public class RobotRCActivity extends ZmqActivity {
     @Override
     protected void onDestroy() {
     	super.onDestroy();
-    	mZmqHandler.onDestroy();
+    	ZmqHandler.destroyInstance();
     }
 
     private void setProperties() {

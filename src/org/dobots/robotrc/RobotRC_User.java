@@ -18,19 +18,18 @@
 */
 package org.dobots.robotrc;
 
-import org.dobots.communication.control.ZmqRemoteControlHelper;
-import org.dobots.communication.control.ZmqRemoteControlSender;
-import org.dobots.communication.video.VideoDisplayThread;
-import org.dobots.communication.video.VideoHelper;
-import org.dobots.communication.zmq.ZmqActivity;
-import org.dobots.communication.zmq.ZmqConnectionHelper;
-import org.dobots.communication.zmq.ZmqConnectionHelper.UseCase;
-import org.dobots.communication.zmq.ZmqHandler;
 import org.dobots.utilities.Utils;
 import org.dobots.utilities.VerticalSeekBar;
+import org.dobots.zmq.ZmqActivity;
+import org.dobots.zmq.ZmqConnectionHelper;
+import org.dobots.zmq.ZmqConnectionHelper.UseCase;
+import org.dobots.zmq.ZmqHandler;
+import org.dobots.zmq.video.ZmqVideoReceiver;
+import org.dobots.zmq.video.gui.VideoHelper;
 import org.zeromq.ZMQ;
 
-import robots.ctrl.RemoteControlHelper;
+import robots.ctrl.zmq.ZmqRemoteControlHelper;
+import robots.ctrl.zmq.ZmqRemoteControlSender;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,7 +52,7 @@ public class RobotRC_User extends ZmqActivity {
 	private ZmqConnectionHelper mZmqConnectionHelper;
 	
 	private String mRobotID = "";
-	private VideoDisplayThread m_oVideoDisplayer;
+	private ZmqVideoReceiver m_oVideoDisplayer;
 	private LinearLayout m_layVideo;
 	
 	private VideoHelper mVideoHelper;
@@ -145,7 +144,7 @@ public class RobotRC_User extends ZmqActivity {
 		}
 		
 		if (mVideoHelper != null) {
-			mVideoHelper.onDestroy();
+			mVideoHelper.destroy();
 		}
 	}
 	
@@ -187,12 +186,12 @@ public class RobotRC_User extends ZmqActivity {
 			m_oVideoRecvSocket.subscribe(mRobotID.getBytes());
 			
 			// start a video display thread which receives video frames from the socket and displays them
-			m_oVideoDisplayer = new VideoDisplayThread(ZmqHandler.getInstance().getContext().getContext(), m_oVideoRecvSocket);
-			m_oVideoDisplayer.setRawVideoListner(mVideoHelper);
+			m_oVideoDisplayer = new ZmqVideoReceiver(m_oVideoRecvSocket);
+			m_oVideoDisplayer.setRawVideoListener(mVideoHelper);
 			m_oVideoDisplayer.setFPSListener(mVideoHelper);
 			m_oVideoDisplayer.start();
 			
-			mVideoHelper.onStartVideo(false);
+			mVideoHelper.onStartVideoPlayback(false);
     	}
     }
     
@@ -205,7 +204,7 @@ public class RobotRC_User extends ZmqActivity {
 		}
 
 		if (mVideoHelper != null) {
-			mVideoHelper.onStopVideo();
+			mVideoHelper.onStopVideoPlayback();
 			mVideoHelper = null;
 		}
     	

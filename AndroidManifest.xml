@@ -54,7 +54,7 @@
 		<activity android:name="robots.piratedotty.gui.PirateDottyRobot"
 		    android:screenOrientation="portrait" ></activity>
 		
-        <activity android:name="robots.gui.DeviceListActivity"
+        <activity android:name="robots.gui.comm.bluetooth.BluetoothDeviceListActivity"
 			android:label="@string/select_device"
 			android:screenOrientation="portrait" 
 			android:theme="@android:style/Theme.Dialog"

@@ -18,9 +18,9 @@
 */
 package org.dobots.robotrc;
 
-import org.dobots.communication.zmq.ZmqActivity;
-import org.dobots.communication.zmq.ZmqConnectionHelper;
-import org.dobots.communication.zmq.ZmqConnectionHelper.UseCase;
+import org.dobots.zmq.ZmqActivity;
+import org.dobots.zmq.ZmqConnectionHelper;
+import org.dobots.zmq.ZmqConnectionHelper.UseCase;
 
 import robots.RobotType;
 import robots.gui.RobotLaunchHelper;
